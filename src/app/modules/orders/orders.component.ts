@@ -126,11 +126,13 @@ export class OrdersComponent implements OnInit {
     ngOnInit() {
         this.getAllProducts();
         this.getImgs('notFoundCart');
-        this.layoutConfig()
+
 
         this.orderService.changeTheme('lara-light-blue', 'light')
     }
 
+
+    //TODO - Gravar layout do cliente
     layoutConfig(){
         const productsCookie = this.CookieService.getCookie('layoutconfig');
         const products = JSON.parse(productsCookie);
