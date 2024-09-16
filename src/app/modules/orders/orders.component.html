@@ -1,0 +1,582 @@
+<div class="grid">
+    <div class="col-12 md:col-12 sm:col-12">
+        <div class="card p-fluid">
+            <h5 class="font-semibold">Produtos Bravan Parts</h5>
+
+            <div class="grid">
+                <div class="col-12">
+                    <div class="card">
+                        <p-dataView #dv
+                        [value]="filteredProducts"
+                        [paginator]="true"
+                        [rows]="9"
+                        filterBy="nome"
+                        [sortField]="sortField"
+                        [sortOrder]="sortOrder"
+                        layout="list">
+
+                            <ng-template  pTemplate="header">
+                                <div [@fadeSlideIn] *ngIf="!isLoading" class="grid">
+                                    <div class="col-12 md:col-12 lg:col-4">
+                                        <div class="p-3 border-round-sm surface-100">
+                                            <span class="text-400">ID</span>
+                                            <!-- Multi select - Id -  -->
+                                            <p-multiSelect
+                                            [options]="filterProductLists['id']"
+                                            [(ngModel)]="filterProductDto['id']"
+                                            (click)="tst(filterProductDto)"
+                                            (onChange)="applyFilter()"
+                                            [filter]="true"
+                                            optionLabel="id"
+                                            optionValue="id"
+                                            display="chip"
+                                            [showClear]="true"
+                                            placeholder="Selecione o id"
+                                            class="w-full" />
+                                        </div>
+                                    </div>
+
+                                    <div class="col-12 md:col-12 lg:col-4">
+                                        <div class="p-3 border-round-sm surface-100">
+                                            <span class="text-400">Nome</span>
+                                            <!-- Multi select - Nome -->
+                                            <p-multiSelect
+                                            [options]="filterProductLists['nome']"
+                                            [(ngModel)]="filterProductDto['nome']"
+                                            (onChange)="applyFilter()"
+                                            [filter]="true"
+                                            optionLabel="nome"
+                                            optionValue="nome"
+                                            display="chip"
+                                            [showClear]="true"
+                                            placeholder="Nome do produto"
+                                            class="w-full" />
+                                        </div>
+                                    </div>
+
+                                    <div class="col-12 md:col-12 lg:col-4">
+                                        <div class="p-3 border-round-sm surface-100">
+                                            <span class="text-400">Código</span>
+                                            <!-- Multi select    - Código -->
+                                            <p-multiSelect
+                                            [options]="filterProductLists['codigo']"
+                                            [(ngModel)]="filterProductDto['codigo']"
+                                            (onChange)="applyFilter()"
+                                            [filter]="true"
+                                            optionLabel="codigo"
+                                            optionValue="codigo"
+                                            display="chip"
+                                            [showClear]="true"
+                                            placeholder="Selecione a situação do seu produto"
+                                            class="w-full"/>
+                                        </div>
+                                    </div>
+
+
+
+                                    <div class="col-12 md:col-12 lg:col-6">
+                                        <div class="p-3 border-round-sm surface-100">
+                                            <span class="text-400">Situação</span>
+                                            <!-- Multi select - Situação -->
+                                            <p-selectButton
+                                            class="w-full"
+                                            [options]="situacaoValues"
+                                            [(ngModel)]="filterProductDto['situacao']"
+                                            (onChange)="applyFilter()"></p-selectButton>
+                                        </div>
+                                    </div>
+
+
+
+                                    <div class="col-12 md:col-12 lg:col-6">
+                                        <div class="p-3 border-round-sm surface-100">
+                                            <span class="text-400 mb-2">Preço</span>
+
+                                            <!-- Slider -  Preço -->
+                                            <p-slider
+                                            [(ngModel)]="filterProductDto['preco']"
+                                            (onChange)="applyFilter()"
+                                            [range]="true"
+                                            [min]="0"
+                                            [max]="2000"
+                                            class="text-400 mt-2"
+                                            styleClass="w-full"></p-slider>
+                                            <p class="text-400 mt-2">{{ filterProductDto['preco'][0] }} - {{ filterProductDto['preco'][1] }}
+                                            </p> <!-- Mostra o intervalo selecionado -->
+
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                                <span>
+                                    <p-button
+                                    [@fadeSlideIn]
+                                    *ngIf="!isLoading"
+                                    icon="pi pi-filter-slash"
+                                    label="Limpar filtro"
+                                    [pTooltip]="'Limpar filtro'"
+                                    [tooltipPosition]="'bottom'"
+                                    (click)="clearFilter()"
+                                    class="w-full"
+                                    styleClass="mb-2 p-button-sm"></p-button>
+                                </span>
+
+                                <div [@fadeSlideIn] *ngIf="isLoading" class="grid">
+
+                                    <p-skeleton styleClass="h-3rem" class="xl:col-4 md:col-12 sm:col-12 border-round h-4rem" />
+                                    <p-skeleton styleClass="h-3rem" class="xl:col-4 md:col-12 sm:col-12 border-round h-4rem" />
+                                    <p-skeleton styleClass="h-3rem" class="xl:col-4 md:col-12 sm:col-12 border-round h-4rem" />
+                                    <p-skeleton styleClass="h-3rem" class="xl:col-6 md:col-12 sm:col-12 border-round h-4rem" />
+                                    <p-skeleton styleClass="h-3rem"  class="xl:col-6 md:col-12 sm:col-12 border-round h-4rem" />
+                                </div>
+
+                            </ng-template>
+
+
+                            <ng-template let-products pTemplate="list">
+
+                                <ng-container [@fadeSlideIn]  *ngIf="isLoading; else showProducts">
+                                    <div class="grid grid-nogutter">
+                                        <div class="col-12" *ngFor="let i of counterArray(6); let first = first"
+                                            class="col-12">
+                                            <div class="flex flex-column xl:flex-row xl:align-items-start p-4 gap-4"
+                                                [ngClass]="{ 'border-top-1 surface-border': !first }">
+                                                <p-skeleton
+                                                    styleClass="w-9 sm:w-16rem xl:w-10rem h-6rem block xl:block mx-auto border-round" />
+                                                <div
+                                                    class="flex flex-column sm:flex-row justify-content-between align-items-center xl:align-items-start flex-1 gap-4">
+                                                    <div
+                                                        class="flex flex-column align-items-center sm:align-items-start gap-3">
+                                                        <p-skeleton styleClass="w-8rem border-round h-2rem" />
+                                                        <p-skeleton styleClass="w-6rem border-round h-1rem" />
+                                                        <div class="flex align-items-center gap-3">
+                                                            <p-skeleton styleClass="w-6rem border-round h-1rem" />
+                                                            <p-skeleton styleClass="w-3rem border-round h-1rem" />
+                                                        </div>
+                                                    </div>
+                                                    <div
+                                                        class="flex sm:flex-column align-items-center sm:align-items-end gap-3 sm:gap-2">
+                                                        <p-skeleton styleClass="w-4rem border-round h-2rem" />
+                                                        <p-skeleton shape="circle" styleClass="w-3rem h-3rem" />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </ng-container>
+
+                                    <div
+                                    [@fadeSlideIn]
+                                    #showProducts
+                                    class="col-12 shadow-2 border-round-sm mb-2 "
+                                    *ngFor="let product of products">
+                                    <div class="grid sm:align-items-center p-2">
+                                        <div class="xl:col-4 md:col-12 sm:col-12">
+                                            <div class="xl:col-4 flex-column align-items-start md:col-12 flex-column align-items-center sm:col-12 flex-column align-items-center" >
+                                                <span class="font-semibold">
+                                                    {{product.produto.id}}
+                                                </span>
+                                                <div [pTooltip]="product.produto.nome" class="font-bold">
+                                                    {{product.produto.nome.substring(0,20)}}</div>
+                                                <!-- <div class="mb-2">{{product.produto.unidade}}</div> -->
+                                                <!-- <p-rating [ngModel]="3" [readonly]="true" [cancel]="false" styleClass="mb-2"></p-rating> -->
+                                                <div class="flex align-items-center mt-2">
+                                                    <i class="pi pi-tag mr-2"></i>
+                                                    <span
+                                                        [class]="'font-semibold '+ 'situacao-' + product.produto.situacao +'-chip'">{{situacaoMapper[product.produto.situacao]}}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class=" flex xl:col-8 flex-column align-items-end justify-content-end md: col-12 flex-column align-items-end justify-content-end  sm:col-12 flex-column align-items-end justify-content-center">
+                                                <span class="text-2xl font-semibold mb-2 md:align-self-end sm:align-self-end">
+                                                    R${{product.produto.preco}}
+                                                </span>
+                                                <span class="flex flex-row column-gap-1 md:align-self-end sm:align-self-end">
+                                                    <p-button icon="pi pi-cart-plus" label="Adicionar ao carrinho"
+                                                        [pTooltip]="'Adicionar ao carrinho'"
+                                                        (click)="addToCart(product.produto.id,1)"
+                                                        [tooltipPosition]="'bottom'"
+                                                        styleClass="mb-2 mr-2 p-button-sm">
+                                                    </p-button>
+                                                    <p-button icon="pi pi-eye" [pTooltip]="'Ver detalhes'"
+                                                        (click)="getDetailProduct(product.produto.id)"
+                                                        [tooltipPosition]="'bottom'"
+                                                        styleClass="mb-2 p-button-sm">
+                                                    </p-button>
+                                                </span>
+                                            </div>
+                                    </div>
+
+                                </div>
+                            </ng-template>
+
+                        </p-dataView>
+
+
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+
+    </div>
+    <p-dialog
+    *ngIf="viewDialog"
+    header="Itens do Pedido"
+    [(visible)]="viewDialog"
+    [draggable]="false"
+    [maximizable]="true"
+    [modal]="true"
+    [style]="{ width: '80vw' }">
+        <div class="card">
+            <div  [@fadeSlideIn] *ngIf="!this.orderService.isCartLoading()" class="grid">
+
+                <div class="col-12 md:col-12 lg:col-4">
+                    <div class="flex align-items-center p-3 border-round-sm surface-100">
+                        <p-image
+                        [src]="productDetail['productDetail'] &&
+                        productDetail['productDetail'].length > 0 ?
+                        productDetail['productDetail'][0]
+                        :'../../../assets/layout/images/prd.png'
+                        "
+                        alt="Image"
+                        width="250"
+                        [preview]="true" />
+                    </div>
+                </div>
+                <div class="col-12 xl:col-8 lg:col-8 sm:col-12">
+                    <div class="p-3 border-round-sm surface-100">
+                        <span class="text-400">Nome do produto</span>
+                        <p style="font-size: 1.4rem" class="font-bold">
+                            <strong>{{
+                                productDetail['nome']
+                                }}</strong>
+                        </p>
+                    </div>
+                </div>
+                <div class="col-12 md:col-12 lg:col-4">
+                    <div class="p-3 border-round-sm surface-100">
+                        <span class="text-400">Fornecedor</span>
+                        <p style="font-size: 1.4rem" class="font-bold">
+                            <strong>{{ productDetail['nome_fornecedor'] }}</strong>
+                        </p>
+                    </div>
+                </div>
+                <div class="col-12 md:col-12 lg:col-4">
+                    <div class="p-3 border-round-sm surface-100">
+                        <span class="text-400">Unidade</span>
+                        <p style="font-size: 1.4rem" class="font-bold">
+                            <strong>{{ productDetail['unidade'] }}</strong>
+                        </p>
+                    </div>
+                </div>
+                <div class="col-12 md:col-12 lg:col-4">
+                    <div class="p-3 border-round-sm surface-100">
+                        <span class="text-400">Unidade por caixa</span>
+                        <p style="font-size: 1.4rem" class="font-bold">
+                            <strong>{{productDetail['unidade_por_caixa']}}</strong>
+                        </p>
+                    </div>
+                </div>
+                <div class="col-12 md:col-12 lg:col-4">
+                    <div class="p-3 border-round-sm surface-100">
+                        <span class="text-400">Situação</span>
+                        <p style="font-size: 1.4rem" class="font-bold">
+                            <strong>{{productDetail['situacao']}}</strong>
+                        </p>
+                    </div>
+                </div>
+                <div class="col-12 md:col-12 lg:col-4">
+                    <div class="p-3 border-round-sm surface-100">
+                        <span class="text-400">Categoria</span>
+                        <p style="font-size: 1.4rem" class="font-bold">
+                            <strong>{{productDetail['categoria']}}</strong>
+                        </p>
+                    </div>
+                </div>
+                <div class="col-12 md:col-12 lg:col-4">
+                    <div class="p-3 border-round-sm surface-100">
+                        <span class="text-400">Preço</span>
+                        <p style="font-size: 1.4rem" class="font-bold">
+                            <strong>{{'R$ ' + productDetail['preco']}}</strong>
+                        </p>
+                    </div>
+                </div>
+                <div class="col-12 md:col-12 lg:col-4">
+                    <div class="p-3 border-round-sm surface-100">
+                        <span class="flex flex-column">
+                            <span class="text-400">Quantidade</span>
+                            <p-inputNumber
+                            [(ngModel)]="productDetail['quantidade']"
+                            mode="decimal"
+                            [showButtons]="true"
+                            [min]="0">
+                            </p-inputNumber>
+                        </span>
+                    </div>
+                </div>
+                <div class="col-12 md:col-12 lg:col-4">
+                    <div class="p-3 border-round-sm surface-100">
+                        <span class="text-400">Valor</span>
+                        <p style="font-size: 1.4rem" class="font-bold">
+                            <strong>{{'R$ ' + (productDetail['preco'] * productDetail['quantidade']).toFixed(2)}}</strong>
+                        </p>
+                    </div>
+                </div>
+                <div class="col-12 md:col-12 lg:col-4">
+                    <div class="p-3 border-round-sm surface-100">
+                        <p-button
+                        class="col-12"
+                        icon="pi pi-cart-plus"
+                        [pTooltip]="'Adicionar ao carrinho'"
+                        label="Adicionar ao carrinho"
+                        (click)="addToCart(productDetail.id,productDetail['quantidade'])"
+                        [tooltipPosition]="'bottom'"
+                        ></p-button>
+                    </div>
+
+                </div>
+            </div>
+
+            <div [@fadeSlideIn] *ngIf="this.orderService.isCartLoading()" class="grid">
+                <p-skeleton styleClass="h-11rem" class="xl:col-6 md:col-12 sm:col-12 border-round h-12rem" />
+                <p-skeleton styleClass="h-3rem" class="xl:col-6 md:col-12 sm:col-12 border-round h-4rem" />
+                <p-skeleton styleClass="h-3rem" class="xl:col-6 md:col-12 sm:col-12 border-round h-4rem" />
+                <p-skeleton styleClass="h-3rem" class="xl:col-6 md:col-12 sm:col-12 border-round h-4rem" />
+                <p-skeleton styleClass="h-3rem" class="xl:col-6 md:col-12 sm:col-12 border-round h-4rem" />
+                <p-skeleton styleClass="h-3rem" class="xl:col-6 md:col-12 sm:col-12 border-round h-4rem" />
+                <p-skeleton styleClass="h-3rem" class="xl:col-6 md:col-12 sm:col-12 border-round h-4rem" />
+                <p-skeleton styleClass="h-3rem" class="xl:col-6 md:col-12 sm:col-12 border-round h-4rem" />
+                <p-skeleton styleClass="h-3rem" class="xl:col-6 md:col-12 sm:col-12 border-round h-4rem" />
+            </div>
+        </div>
+        <div  [@fadeSlideIn] *ngIf="!this.orderService.isCartLoading()" class="xl:col-12 sm:col-12">
+            <div class="p-3 border-round-sm surface-100">
+                <span class="text-400">Descricao</span>
+                <div [innerHTML]="productDetail['descricao_complementar']" style="font-size: 1.4rem">
+                </div>
+            </div>
+        </div>
+    </p-dialog>
+
+
+    <!-- Carrinho -->
+    <p-dialog
+    *ngIf="viewDialogCarrinho && !this.getGetPdfState()"
+    [header]="!this.orderService.productsOnOrder().length <= 0 ? 'Carrinho' : ''"
+    [(visible)]="viewDialogCarrinho"
+    [draggable]="false"
+    [maximizable]="true"
+    [modal]="true"
+    [style]="{
+        width: '90vw'
+        }">
+    <div class="card">
+        <!-- Ativo quando:
+         - carrinho não está carregando
+         - e quando o número de produtos no carrinh for maior que 0-->
+
+        <div class="
+        w-100
+        flex
+        flex-row
+        align-items-center
+        justify-content-end
+        p-2
+        column-gap-1
+        " *ngIf="!this.orderService.productsOnOrder().length <= 0" >
+
+            <span *ngIf="!this.orderService.isCartLoading()" >
+            <p-button
+            (click)="exportToExcel()"
+            label="Exportar para excel"
+            icon="pi pi-file-excel"
+            class="w-full"
+            styleClass="h-3rem w-100">
+            </p-button>
+        </span>
+
+        <span *ngIf="!this.orderService.isCartLoading()" >
+            <p-button
+            (click)="exportToPdf()"
+            label="Exportar para pdf"
+            icon="pi pi-file-pdf"
+            class="w-full"
+            styleClass="h-3rem w-100">
+            </p-button>
+        </span>
+
+
+        <div *ngIf="this.orderService.isCartLoading()" class="grid">
+            <p-skeleton styleClass="h-3rem" class="xl:col-6 md:col-12 sm:col-12 border-round h-4rem" />
+            <p-skeleton styleClass="h-3rem" class="xl:col-6 md:col-12 sm:col-12 border-round h-4rem" />
+        </div>
+    </div>
+
+    <div *ngIf="!this.orderService.productsOnOrder().length <= 0"  class="xl:col-12 sm:col-12">
+        <div
+        class="col-12 shadow-2 border-round-sm mb-2 "
+        *ngFor="let product of this.orderService.productsOnOrder() ">
+         <!-- Ativo quando carrinho está carregando -->
+        <div *ngIf="this.orderService.isCartLoading()" class="grid">
+            <p-skeleton styleClass="h-5rem" class="xl:col-12 md:col-12 sm:col-12 border-round h-4rem" />
+            <p-skeleton styleClass="h-5rem" class="xl:col-12 md:col-12 sm:col-12 border-round h-4rem" />
+        </div>
+
+
+            <div
+            *ngIf="!this.orderService.isCartLoading() "
+            class="
+            flex flex-column
+            md:flex-row justify-content-between w-full">
+                <div class="col-4 my-4 md:my-0 w-9 md:w-10rem  mr-5">
+
+                    <span class="flex xl:flex-row column-gap-1 md:flex-column row-gap-1">
+                    <p-image
+                    [src]="productDetail['productDetail'] &&
+                    productDetail['productDetail'].length > 0 ?
+                    productDetail['productDetail'][0]
+                    :'../../../assets/layout/images/prd.png'
+                    "
+                    alt="Image"
+                    width="100"
+                    [preview]="true" />
+
+                    <span>
+                        <span class="font-semibold">
+                            {{product.id}}
+                        </span>
+                        <div [pTooltip]="product.nome" class="font-bold">
+                            {{product.nome.substring(0,25)}}</div>
+                        <!-- <div class="mb-2">{{product.produto.unidade}}</div> -->
+                        <!-- <p-rating [ngModel]="3" [readonly]="true" [cancel]="false" styleClass="mb-2"></p-rating> -->
+                        <div class="flex align-items-center mt-2">
+                            <i class="pi pi-tag mr-2"></i>
+                            <span [class]="'font-semibold '+ 'situacao-' + product.situacao +'-chip'">{{situacaoMapper[product.situacao]}}</span>
+                        </div>
+                        </span>
+                    </span>
+
+
+
+                </div>
+                <div class="
+                        col-8
+                        flex flex-row
+                        md:flex-column justify-content-between w-full
+                        md:w-auto align-items-center
+                        md:align-items-end mt-5
+                        md:mt-0">
+
+                    <span class="text-2xl font-semibold mb-2 align-self-center md:align-self-end">
+                        <span>
+                            R${{(product.preco * product.quantidade).toFixed(2)}}
+                        </span>
+                    </span>
+                    <span class="flex flex-row column-gap-3 justify-content-center">
+                        <p-button icon="pi pi-minus-circle" severity="danger" (click)="decrementProductFromCart(product,1)"
+                            [tooltipPosition]="'bottom'" class="text-2xl" styleClass=" p-button-md">
+                        </p-button>
+
+                        <span class="font-semibold">{{product.quantidade}}</span>
+
+                        <p-button icon="pi pi-plus-circle" severity="success" (click)="addToCart(product.id,1)"
+                            [tooltipPosition]="'bottom'" class="text-2xl" styleClass=" p-button-md">
+                        </p-button>
+                    </span>
+
+                </div>
+                </div>
+            </div>
+    </div>
+
+
+     <!-- Ativo quando:
+         - e quando o número de produtos no carrinh for menor ou = á 0-->
+    <div *ngIf="this.orderService.productsOnOrder().length <= 0" class="flex justify-content-center">
+
+
+        <span class="flex flex-column align-items-center">
+            <h2 class="font-semibold">
+                Carrinho Vazio
+            </h2>
+            <h3>
+                Adicione itens para fechar seu pedido !
+            </h3>
+            <img
+            [height]="250"
+            [width]="250"
+            [src]="
+            'data:image/svg+xml;base64,' +
+            (imgs['notFoundCart'] | async)"
+            alt="Imagem em Base64">
+        </span>
+
+    </div>
+</div>
+
+
+    </p-dialog>
+
+    <p-sidebar
+    [showCloseIcon]="false"
+    [visible]="this.getGetPdfState()"
+    [fullScreen]="true" [baseZIndex]="10000">
+        <div>
+            <span class="w-100 flex flex-row align-items-center justify-content-between column-gap-3 ">
+                <span class="flex flex row align-items-center column-gap-1">
+                    <span>
+                        <i  style="font-size: 2.5rem" class="pi pi-file-pdf"></i>
+                    </span>
+                    <h3 class="text-2xl font-semibold">
+                        Pdf do pedido
+                    </h3>
+                </span>
+
+
+                <div class=" flex flex-row align-items-center column-gap-1 mb-3
+                ">
+                    <p-button
+                        (click)="emBreve($event,'envio por whatsapp')"
+                        label="Enviar por Zap"
+                        icon="pi pi-whatsapp"
+                        severity="success">
+                    </p-button>
+
+                    <p-button
+                        (click)="emBreve($event,'envio por email')"
+                        label="Enviar por email"
+                        icon="pi pi-send"
+                        severity="success">
+                    </p-button>
+                    <p-confirmPopup key="confirm2"></p-confirmPopup>
+
+                    <p-button
+                    (onClick)="setPdfState(false)"
+                    icon="pi pi-times-circle"
+                    severity="danger">
+                    </p-button>
+                </div>
+            </span>
+
+            <div style="height: 80vh;" class="grid">
+                <div style="height: 100%;" class="col-12">
+                    <!-- Funcionou ! -->
+                <iframe
+                    style="height: 100%;" class="w-full h-full"
+                    [title]="'PDF DO PEDIDO'"
+                    [src]="safeUrl" frameborder="0">
+                </iframe>   <!-- -->
+
+                </div>
+              </div>
+            </div>
+
+
+    </p-sidebar>
+</div>
+
+<p-toast key="tst"></p-toast>

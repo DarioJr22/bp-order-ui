@@ -1,0 +1,61 @@
+<div class="layout-topbar">
+    <a class="layout-topbar-logo" routerLink="">
+        <img src="assets/layout/images/{{layoutService.config().colorScheme === 'light' ? 'logo-dark' : 'logo-white'}}.png" alt="logo">
+    </a>
+
+    <button #menubutton
+    class="p-link layout-menu-button layout-topbar-button" (click)="layoutService.onMenuToggle()">
+        <i class="pi pi-bars"></i>
+    </button>
+
+    <button #topbarmenubutton class="p-link layout-topbar-menu-button layout-topbar-button" (click)="layoutService.showProfileSidebar()">
+        <i class="pi pi-ellipsis-v"></i>
+    </button>
+
+    <div #topbarmenu class="layout-topbar-menu" [ngClass]="{'layout-topbar-menu-mobile-active': layoutService.state.profileSidebarVisible}">
+
+        <!-- Toogler darkmode e ligh mode -->
+        <button class="p-link layout-topbar-button" (click)="toggleTheme()">
+          <!--   <i class="pi pi-shopping-cart " pBadge style="font-size: 2rem" [value]="cartCount" severity="danger"></i>
+            <i class="pi pi-shopping-cart mr-4 p-text-secondary" pBadge style="font-size: 2rem" [value]="cartCount" severity="danger"></i> -->
+
+            <i
+            *ngIf="!darkMode"
+            class="pi pi-sun "
+            style="font-size: 2rem"
+            ></i>
+
+            <i
+            *ngIf="darkMode"
+            class="pi pi-moon "
+            style="font-size: 2rem"
+            ></i>
+            <span class="subtitle">Dark-mode</span>
+        </button>
+
+        <!-- Carrinho abaixo de 0 é carrinho normal -->
+        <button class="p-link layout-topbar-button" (click)="seiOqueLla()">
+            <i
+            *ngIf="cartCount > 0"
+            class="pi pi-shopping-cart"
+            pBadge
+            style="font-size: 2rem"
+            [value]="cartCount <= 15 ? cartCount : '15+' "
+            severity="danger"></i>
+
+            <i *ngIf="cartCount <= 0" class="pi pi-shopping-cart" style="font-size: 2rem" ></i>
+
+            <span class="subtitle">Carrinho</span>
+        </button>
+
+        <button (click)="emBreve($event,'Perfil de usuário')" class="p-link layout-topbar-button">
+            <i class="pi pi-user"></i>
+            <span class="subtitle">Profile</span>
+        </button>
+        <p-confirmPopup key="confirm2"></p-confirmPopup>
+    </div>
+
+
+</div>
+
+

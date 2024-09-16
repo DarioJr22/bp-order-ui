@@ -1,0 +1,49 @@
+.situacao-A-chip{
+    color:green;
+    background:#bbfabb;
+    padding:0.3rem;
+    border-radius: 0.3rem;
+
+}
+
+.situacao-E-chip{
+    color:#2c2c2c;
+    background:#9c9e9c;
+    padding:0.3rem;
+    border-radius: 0.3rem;
+}
+
+.situacao-I-chip{
+    color:#ae0000;
+    background:#fabbbb;
+    padding:0.3rem;
+    border-radius: 0.3rem;
+}
+
+
+:host ::ng-deep .p-multiselect {
+    min-width: 15rem;
+}
+
+::ng-deep .p-multiselect-panel .p-multiselect-items {
+    padding: 0.75rem 0;
+    max-width: 22rem;
+  }
+
+  ::ng-deep  .p-multiselect-items-wrapper {
+    overflow: auto;
+    max-width: 22rem;
+}
+
+::ng-deep  .p-multiselect-panel{
+    max-width: 22rem;
+}
+
+.p-button {
+    --button-transform: none; /* Remove transformações no tema, se suportado */
+    --button-focus-box-shadow: none; /* Remove a sombra de foco */
+  }
+
+  h2,h3{
+    margin: 0;
+  }
