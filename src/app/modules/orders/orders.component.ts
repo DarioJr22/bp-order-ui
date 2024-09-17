@@ -104,13 +104,15 @@ export class OrdersComponent implements OnInit {
 
 
 
+
+
     constructor(
         private orderService: OrdersService,
         private messageService: MessageService,
         private sanitizer: DomSanitizer,
         private confirmationService: ConfirmationService,
         private CookieService:CookieServiceImp,
-        private layoutService:LayoutService
+        public layoutService:LayoutService
     ) {
         this.situacaoValues = Object.values(this.situacaoMapper);
         this.orderService.modalState$.subscribe((state:boolean) => {
@@ -353,14 +355,10 @@ export class OrdersComponent implements OnInit {
         this.confirmationService.confirm({
             key: 'confirm2',
             target: e.target || new EventTarget,
+            acceptLabel: 'OK', // Texto do botão
+            rejectVisible: false, // Esconde o botão "No"
             message: `Em breve a funcionalidade de ${string} estará disponível`,
-            icon: 'pi pi-exclamation-triangle',
-            accept: () => {
-                this.messageService.add({ severity: 'info', summary: 'Confirmed', detail: 'You have accepted' });
-            },
-            reject: () => {
-                this.messageService.add({ severity: 'error', summary: 'Rejected', detail: 'You have rejected' });
-            }
+            icon: 'pi pi-exclamation-triangle'
         });
     }
 

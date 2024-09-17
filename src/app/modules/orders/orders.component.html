@@ -193,7 +193,7 @@
                                                     R${{product.produto.preco}}
                                                 </span>
                                                 <span class="flex flex-row column-gap-1 md:align-self-end sm:align-self-end">
-                                                    <p-button icon="pi pi-cart-plus" label="Adicionar ao carrinho"
+                                                    <p-button icon="pi pi-cart-plus" [label]="!this.layoutService.isDesktop() ? '':'Adicionar ao carrinho'"
                                                         [pTooltip]="'Adicionar ao carrinho'"
                                                         (click)="addToCart(product.produto.id,1)"
                                                         [tooltipPosition]="'bottom'"
@@ -235,7 +235,7 @@
             <div  [@fadeSlideIn] *ngIf="!this.orderService.isCartLoading()" class="grid">
 
                 <div class="col-12 md:col-12 lg:col-4">
-                    <div class="flex align-items-center p-3 border-round-sm surface-100">
+                    <div class="flex align-items-center justify-content-center-3 border-round-sm surface-100">
                         <p-image
                         [src]="productDetail['productDetail'] &&
                         productDetail['productDetail'].length > 0 ?
@@ -243,7 +243,7 @@
                         :'../../../assets/layout/images/prd.png'
                         "
                         alt="Image"
-                        width="250"
+                        [width]="!this.layoutService.isDesktop() ? 100:250"
                         [preview]="true" />
                     </div>
                 </div>
@@ -313,7 +313,8 @@
                             [(ngModel)]="productDetail['quantidade']"
                             mode="decimal"
                             [showButtons]="true"
-                            [min]="0">
+                            [min]="0"
+                            class="w-full">
                             </p-inputNumber>
                         </span>
                     </div>
@@ -327,12 +328,12 @@
                     </div>
                 </div>
                 <div class="col-12 md:col-12 lg:col-4">
-                    <div class="p-3 border-round-sm surface-100">
+                    <div class="flex justify-content-center p-3 border-round-sm surface-100">
                         <p-button
                         class="col-12"
                         icon="pi pi-cart-plus"
                         [pTooltip]="'Adicionar ao carrinho'"
-                        label="Adicionar ao carrinho"
+                        [label]="!this.layoutService.isDesktop() ? '':'Adicionar ao carrinho'"
                         (click)="addToCart(productDetail.id,productDetail['quantidade'])"
                         [tooltipPosition]="'bottom'"
                         ></p-button>
@@ -372,7 +373,7 @@
     [maximizable]="true"
     [modal]="true"
     [style]="{
-        width: '90vw'
+        width: '100vw'
         }">
     <div class="card">
         <!-- Ativo quando:
@@ -387,6 +388,9 @@
         justify-content-end
         p-2
         column-gap-1
+        row-gap-2
+        md:flex-column
+        sm:flex-column
         " *ngIf="!this.orderService.productsOnOrder().length <= 0" >
 
             <span *ngIf="!this.orderService.isCartLoading()" >
@@ -432,9 +436,9 @@
             class="
             flex flex-column
             md:flex-row justify-content-between w-full">
-                <div class="col-4 my-4 md:my-0 w-9 md:w-10rem  mr-5">
+                <div class="col-8 my-4 md:my-0 w-9 md:w-10rem  mr-5">
 
-                    <span class="flex xl:flex-row column-gap-1 md:flex-column row-gap-1">
+                    <span class="flex column-gap-3 xl:flex-row column-gap-1 md:flex-column row-gap-1">
                     <p-image
                     [src]="productDetail['productDetail'] &&
                     productDetail['productDetail'].length > 0 ?
@@ -445,7 +449,7 @@
                     width="100"
                     [preview]="true" />
 
-                    <span>
+                    <span class="flex flex-column row-gap-2 ">
                         <span class="font-semibold">
                             {{product.id}}
                         </span>
@@ -526,18 +530,32 @@
     [visible]="this.getGetPdfState()"
     [fullScreen]="true" [baseZIndex]="10000">
         <div>
-            <span class="w-100 flex flex-row align-items-center justify-content-between column-gap-3 ">
-                <span class="flex flex row align-items-center column-gap-1">
+            <span class="w-100
+                         xl:flex flex-row align-items-center justify-content-between column-gap-3
+                         lg:flex flex-row align-items-center justify-content-between column-gap-3
+                         md:flex flex-column align-items-between justify-content-around row-gap-3
+                         sm:flex flex-column align-items-between justify-content-around row-gap-3">
+                <span class="flex flex-row align-items-center justify-content-between column-gap-1">
                     <span>
                         <i  style="font-size: 2.5rem" class="pi pi-file-pdf"></i>
                     </span>
                     <h3 class="text-2xl font-semibold">
                         Pdf do pedido
                     </h3>
+
+                    <p-button
+                    *ngIf="!this.layoutService.isDesktop()"
+                    (onClick)="setPdfState(false)"
+                    icon="pi pi-times-circle"
+                    severity="danger">
+                    </p-button>
+
                 </span>
 
 
-                <div class=" flex flex-row align-items-center column-gap-1 mb-3
+                <div class="
+                flex flex-row align-items-center justify-content-between column-gap-3 row-gap-3
+                md:flex-column sm:flex-column
                 ">
                     <p-button
                         (click)="emBreve($event,'envio por whatsapp')"
@@ -549,12 +567,13 @@
                     <p-button
                         (click)="emBreve($event,'envio por email')"
                         label="Enviar por email"
-                        icon="pi pi-send"
-                        severity="success">
+                        icon="pi pi-at"
+                        severity="info">
                     </p-button>
                     <p-confirmPopup key="confirm2"></p-confirmPopup>
 
                     <p-button
+                    *ngIf="this.layoutService.isDesktop()"
                     (onClick)="setPdfState(false)"
                     icon="pi pi-times-circle"
                     severity="danger">

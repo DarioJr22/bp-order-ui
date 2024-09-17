@@ -43,6 +43,8 @@ export class AppTopBarComponent {
         this.confirmationService.confirm({
             key: 'confirm2',
             target: e.target || new EventTarget,
+            acceptLabel: 'OK', // Texto do botão
+            rejectVisible: false, // Esconde o botão "No"
             message: `Em breve a funcionalidade de ${string} estará disponível`,
             icon: 'pi pi-exclamation-triangle'
         });
