@@ -531,8 +531,8 @@
     [fullScreen]="true" [baseZIndex]="10000">
         <div>
             <span class="w-100
-                         xl:flex flex-row align-items-center justify-content-between column-gap-3
-                         lg:flex flex-row align-items-center justify-content-between column-gap-3
+                         xl:flex flex-row align-items-between justify-content-between column-gap-3
+                         lg:flex flex-row align-items-between justify-content-between column-gap-3
                          md:flex flex-column align-items-between justify-content-around row-gap-3
                          sm:flex flex-column align-items-between justify-content-around row-gap-3">
                 <span class="flex flex-row align-items-center justify-content-between column-gap-1">
@@ -544,7 +544,7 @@
                     </h3>
 
                     <p-button
-                    *ngIf="!this.layoutService.isDesktop()"
+
                     (onClick)="setPdfState(false)"
                     icon="pi pi-times-circle"
                     severity="danger">
@@ -554,8 +554,8 @@
 
 
                 <div class="
-                flex flex-row align-items-center justify-content-between column-gap-3 row-gap-3
-                md:flex-column sm:flex-column
+                flex flex-row align-items-center justify-content-center column-gap-3 row-gap-3 mb-2
+
                 ">
                     <p-button
                         (click)="emBreve($event,'envio por whatsapp')"
@@ -565,19 +565,38 @@
                     </p-button>
 
                     <p-button
-                        (click)="emBreve($event,'envio por email')"
+                    (click)="showDialog()"
                         label="Enviar por email"
                         icon="pi pi-at"
                         severity="info">
                     </p-button>
-                    <p-confirmPopup key="confirm2"></p-confirmPopup>
 
                     <p-button
+                        (click)="downloadToPdf()"
+                        label="Download"
+                        icon="pi pi-download"
+                        severity="info">
+                    </p-button>
+
+                    <p-confirmPopup key="confirm2"></p-confirmPopup>  <!---->
+
+                    <p-dialog [(visible)]="display" [modal]="true" [closable]="false">
+                        <div>
+                          <h4 class="font-semibold">Insira um email ou Telefone válido:</h4>
+                          <input [(ngModel)]="inputValue" type="text" pInputText placeholder="Search"/>
+                        </div>
+                        <p-footer>
+                          <button pButton type="button" label="Enviar" icon="pi pi-check" (click)="confirm()"></button>
+                          <button pButton type="button" label="Cancelar" icon="pi pi-times" severity="danger" (click)="reject()"></button>
+                        </p-footer>
+                      </p-dialog>
+
+                  <!--   <p-button
                     *ngIf="this.layoutService.isDesktop()"
                     (onClick)="setPdfState(false)"
                     icon="pi pi-times-circle"
                     severity="danger">
-                    </p-button>
+                    </p-button> -->
                 </div>
             </span>
 

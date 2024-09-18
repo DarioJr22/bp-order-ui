@@ -12,6 +12,7 @@ import { HtmlContent } from 'src/app/services/html-sanitizer';
 import { AppConfig, LayoutService } from '../../layout/service/app.layout.service';
 import { CookieService } from 'ngx-cookie-service';
 import { CookieServiceImp } from 'src/app/services/coockie.service';
+import { EmailOrder, Order } from './dto/order';
 export class FilterProductDto {
     id: string | string[]
     nome: string | string[]
@@ -310,6 +311,37 @@ export class OrdersComponent implements OnInit {
         })
     }
 
+    downloadToPdf(){
+        this.orderService.isCartLoading.set(true)
+        this.setPdfState(true)
+        let cart = this.orderService.productsOnOrder().map(i => i)
+        this.orderService.exportToPdf(cart).pipe(tap(() => this.orderService.isCartLoading.set(false))).subscribe({
+            next: (order) => {
+                const blob = new Blob([order], { type: 'application/pdf' }); // Define o tipo como PDF
+                const fileName = 'pedido_bravan_parts.pdf';  // Nome do arquivo PDF
+
+                // Usa a API de download nativa do navegador
+                const link = document.createElement('a');
+                link.href = window.URL.createObjectURL(blob);
+                link.download = fileName;
+                link.click();  // Simula o clique para fazer o download
+
+                this.orderService.isCartLoading.set(false);
+
+                // Limpa o objeto blob após o uso
+                window.URL.revokeObjectURL(link.href);
+            }, error: (error) => {
+                console.log(error);
+
+                this.orderService.isCartLoading.set(false)
+                this.setPdfState(false)
+                this.showErrorViaToast('Erro ao exportar para relatório! \n Error:' + error.message)
+            }
+        })
+    }
+
+
+
     exportToExcel(){
         this.orderService.isCartLoading.set(true)
         let cart = this.orderService.productsOnOrder().map(i => i)
@@ -361,6 +393,56 @@ export class OrdersComponent implements OnInit {
             icon: 'pi pi-exclamation-triangle'
         });
     }
+
+    showConfirm(event: Event) {
+        this.confirmationService.confirm({
+          key: 'confirm2',
+          target: event.target!,
+          message: 'Tem certeza que deseja continuar?',
+          accept: () => {
+            this.showErrorViaToast
+            console.log('Valor digitado:', this.inputValue);
+          },
+          reject: () => {
+            console.log('Ação cancelada');
+          }
+        });
+      }
+
+      display: boolean = false;
+      inputValue: string = '';
+
+      showDialog() {
+        this.display = true;
+      }
+
+      confirm() {
+        console.log('Valor digitado:', this.inputValue);
+
+        //Calculate order and send
+        let cart = this.orderService.productsOnOrder().map(i => i);
+        let order = new Order({products:cart});
+        let orderEmail = new EmailOrder();
+            Object.assign(orderEmail,order);
+            orderEmail.contact = this.inputValue;
+
+
+        if((this.inputValue) && (this.inputValue != null)){
+                this.orderService.sendToEmail(orderEmail).subscribe(()=>{
+                    this.showSuccessViaToast('Pedido enviado ao email do vendedor')
+                    this.display = false;
+                });
+            }else{
+                this.showErrorViaToast('Insira um valor válido para enviar o email')
+            }
+
+         // Fechar o diálogo
+      }
+
+      reject() {
+        this.display = false;
+      }
+
 
 
     removeProductFromCart(id: string) {

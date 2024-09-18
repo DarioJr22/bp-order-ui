@@ -1,6 +1,6 @@
 import { computed, Injectable, signal, effect, WritableSignal, Signal, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Order } from './dto/order';
+import { EmailOrder, Order } from './dto/order';
 import { ProductSearchReturn, ReturnProductDto } from './dto/returnProduct';
 import { Product } from './dto/product';
 import { CookieServiceImp } from 'src/app/services/coockie.service';
@@ -23,6 +23,7 @@ export class OrdersService {
     })
   }
 
+//'https://bp-order-api-production.up.railway.app'
 
 
   url = 'https://bp-order-api-production.up.railway.app'
@@ -130,8 +131,8 @@ export class OrdersService {
 
   }
 
-  sendToEmail(){
-
+  sendToEmail(Order:EmailOrder){
+    return this.http.post<any>(`${this.url}/email/send`,Order)
   }
 
 
