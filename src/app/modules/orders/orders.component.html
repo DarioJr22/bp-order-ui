@@ -235,11 +235,11 @@
             <div  [@fadeSlideIn] *ngIf="!this.orderService.isCartLoading()" class="grid">
 
                 <div class="col-12 md:col-12 lg:col-4">
-                    <div class="flex align-items-center justify-content-center-3 border-round-sm surface-100">
+                    <div class="flex align-items-center justify-content-center border-round-sm surface-100">
                         <p-image
-                        [src]="productDetail['productDetail'] &&
-                        productDetail['productDetail'].length > 0 ?
-                        productDetail['productDetail'][0]
+                        [src]="productDetail['anexos'] &&
+                        productDetail['anexos'].length > 0 ?
+                        productDetail['anexos'][0]['anexo']
                         :'../../../assets/layout/images/prd.png'
                         "
                         alt="Image"
