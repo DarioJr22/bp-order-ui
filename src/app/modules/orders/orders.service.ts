@@ -24,9 +24,9 @@ export class OrdersService {
   }
 
 //'https://bp-order-api-production.up.railway.app'
+//http://localhost:3000
 
-
-  url = 'http://localhost:3000'
+  url = 'https://bp-order-api-production.up.railway.app'
 
   //Produtos no carrinho
   productsOnOrder:WritableSignal<Product[]> = signal<Product[]>([])
