@@ -340,6 +340,49 @@ export class OrdersComponent implements OnInit {
         })
     }
 
+    sharePdfViaWhatsApp() {
+        this.orderService.isCartLoading.set(true);
+        this.setPdfState(true);
+        let cart = this.orderService.productsOnOrder().map(i => i);
+
+        this.orderService.exportToPdf(cart).pipe(tap(() => this.orderService.isCartLoading.set(false))).subscribe({
+            next: (order) => {
+                const blob = new Blob([order], { type: 'application/pdf' }); // Cria o Blob do PDF
+                const fileName = 'pedido_bravan_parts.pdf';  // Nome do arquivo PDF
+
+                // Verifica se o navegador suporta a Web Share API com arquivos
+                if (navigator.canShare && navigator.canShare({ files: [new File([blob], fileName)] })) {
+                    // Cria o arquivo para compartilhar
+                    const file = new File([blob], fileName, { type: 'application/pdf' });
+
+                    // Usa a Web Share API para compartilhar o arquivo
+                    navigator.share({
+                        title: 'Pedido Bravan Parts',
+                        text: 'Aqui está o seu pedido em PDF.',
+                        files: [file],  // Arquivo PDF para compartilhar
+                    }).then(() => {
+                        console.log('PDF compartilhado com sucesso!');
+                    }).catch((error) => {
+                        console.error('Erro ao compartilhar:', error);
+                    });
+                } else {
+                    console.warn('Web Share API não é suportada neste navegador.');
+                    this.showErrorViaToast('Compartilhamento não suportado no seu navegador.');
+                }
+
+                this.orderService.isCartLoading.set(false);
+                this.setPdfState(false);
+            },
+            error: (error) => {
+                console.log(error);
+                this.orderService.isCartLoading.set(false);
+                this.setPdfState(false);
+                this.showErrorViaToast('Erro ao gerar o relatório! \n Error:' + error.message);
+            }
+        });
+    }
+
+
 
 
     exportToExcel(){
