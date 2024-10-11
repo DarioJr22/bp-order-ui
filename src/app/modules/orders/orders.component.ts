@@ -72,7 +72,7 @@ export class OrdersComponent implements OnInit {
             nome:'',
             situacao:'',
             codigo:'',
-            preco:[0,2000]
+            preco:[0,1000]
         }
     );
 
@@ -101,9 +101,6 @@ export class OrdersComponent implements OnInit {
         'I': 'Inativo',
         'E': 'Excluído'
     }
-
-
-
 
 
 

@@ -98,7 +98,7 @@
                                             (onChange)="applyFilter()"
                                             [range]="true"
                                             [min]="0"
-                                            [max]="2000"
+                                            [max]="1050"
                                             class="text-400 mt-2"
                                             styleClass="w-full"></p-slider>
                                             <p class="text-400 mt-2">{{ filterProductDto['preco'][0] }} - {{ filterProductDto['preco'][1] }}
@@ -107,6 +107,14 @@
                                         </div>
                                     </div>
 
+                                    <!-- TODO - Fazer implementação de mudança de layout -->
+                                    <!-- <div class="col-12 md:col-12 lg:col-3">
+                                        <div class="p-3 border-round-sm surface-100">
+                                            <span class="text-400 mb-2">Layout</span>
+                                            <p-dataViewLayoutOptions></p-dataViewLayoutOptions>
+                                        </div>
+                                    </div>
+ -->
                                 </div>
 
                                 <span>
@@ -171,42 +179,65 @@
                                     #showProducts
                                     class="col-12 shadow-2 border-round-sm mb-2 "
                                     *ngFor="let product of products">
-                                    <div class="grid sm:align-items-center p-2">
-                                        <div class="xl:col-4 md:col-12 sm:col-12">
-                                            <div class="xl:col-4 flex-column align-items-start md:col-12 flex-column align-items-center sm:col-12 flex-column align-items-center" >
-                                                <span class="font-semibold">
-                                                    {{product.produto.id}}
-                                                </span>
-                                                <div [pTooltip]="product.produto.nome" class="font-bold">
-                                                    {{product.produto.nome.substring(0,20)}}</div>
-                                                <!-- <div class="mb-2">{{product.produto.unidade}}</div> -->
-                                                <!-- <p-rating [ngModel]="3" [readonly]="true" [cancel]="false" styleClass="mb-2"></p-rating> -->
-                                                <div class="flex align-items-center mt-2">
-                                                    <i class="pi pi-tag mr-2"></i>
-                                                    <span
-                                                        [class]="'font-semibold '+ 'situacao-' + product.produto.situacao +'-chip'">{{situacaoMapper[product.produto.situacao]}}</span>
-                                                </div>
+                                    <div class="grid">
+                                        <!-- Seção do produto -->
+                                        <div class="col-12 md:col-8 flex flex-column md:flex-row">
+                                          <!-- Imagem do produto -->
+                                          <div class="col-12 md:col-4">
+                                            <div style="width: 100%;display: flex; justify-content: center;">
+                                            <p-image
+                                              [src]="product.produto['anexos'] && product.produto['anexos'].length > 0 ? product.produto['anexos'][0]['anexo'] : '../../../assets/layout/images/prd.png'"
+                                              [width]="!this.layoutService.isDesktop() ? 100 : 190"
+                                              [preview]="true"
+                                              [alt]="product.produto.nome">
+                                            </p-image>
                                             </div>
+                                          </div>
+
+                                          <!-- Detalhes do produto -->
+                                          <div class="col-12 md:col-8 flex flex-column align-items-start md:align-items-start sm:align-items-center">
+                                            <span class="font-semibold">
+                                              {{ product.produto.id }}
+                                            </span>
+                                            <div [pTooltip]="product.produto.nome" class="font-bold">
+                                              {{ product.produto.nome }}
+                                            </div>
+                                            <!-- <div class="mb-2">{{product.produto.unidade}}</div> -->
+                                            <!-- <p-rating [ngModel]="3" [readonly]="true" [cancel]="false" styleClass="mb-2"></p-rating> -->
+                                            <div class="flex align-items-center mt-2">
+                                              <i class="pi pi-tag mr-2"></i>
+                                              <span [class]="'font-semibold situacao-' + product.produto.situacao + '-chip'">
+                                                {{ situacaoMapper[product.produto.situacao] }}
+                                              </span>
+                                            </div>
+                                          </div>
                                         </div>
-                                        <div class=" flex xl:col-8 flex-column align-items-end justify-content-end md: col-12 flex-column align-items-end justify-content-end  sm:col-12 flex-column align-items-end justify-content-center">
-                                                <span class="text-2xl font-semibold mb-2 md:align-self-end sm:align-self-end">
-                                                    R${{product.produto.preco}}
-                                                </span>
-                                                <span class="flex flex-row column-gap-1 md:align-self-end sm:align-self-end">
-                                                    <p-button icon="pi pi-cart-plus" [label]="!this.layoutService.isDesktop() ? '':'Adicionar ao carrinho'"
-                                                        [pTooltip]="'Adicionar ao carrinho'"
-                                                        (click)="addToCart(product.produto.id,1)"
-                                                        [tooltipPosition]="'bottom'"
-                                                        styleClass="mb-2 mr-2 p-button-sm">
-                                                    </p-button>
-                                                    <p-button icon="pi pi-eye" [pTooltip]="'Ver detalhes'"
-                                                        (click)="getDetailProduct(product.produto.id)"
-                                                        [tooltipPosition]="'bottom'"
-                                                        styleClass="mb-2 p-button-sm">
-                                                    </p-button>
-                                                </span>
-                                            </div>
-                                    </div>
+
+                                        <!-- Seção de ações -->
+                                        <div class="col-12 md:col-4 flex flex-column align-items-end justify-content-end">
+                                          <span class="text-2xl font-semibold mb-2 md:align-self-end sm:align-self-end">
+                                            R${{ product.produto.preco }}
+                                          </span>
+                                          <div class="flex gap-2 md:align-self-end sm:align-self-end">
+                                            <p-button
+                                              icon="pi pi-cart-plus"
+                                              [label]="!this.layoutService.isDesktop() ? '' : 'Adicionar ao carrinho'"
+                                              [pTooltip]="'Adicionar ao carrinho'"
+                                              (click)="addToCart(product.produto.id,1)"
+                                              [tooltipPosition]="'bottom'"
+                                              styleClass="mb-2 p-button-sm">
+                                            </p-button>
+                                            <p-button
+                                              icon="pi pi-eye"
+                                              [pTooltip]="'Ver detalhes'"
+                                              (click)="getDetailProduct(product.produto.id)"
+                                              [tooltipPosition]="'bottom'"
+                                              styleClass="mb-2 p-button-sm">
+                                            </p-button>
+                                          </div>
+                                        </div>
+                                      </div>
+
 
                                 </div>
                             </ng-template>

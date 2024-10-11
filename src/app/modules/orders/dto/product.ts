@@ -56,6 +56,7 @@ export class Product {
     //Propridades adicionadas
     quantidade?:number
     desconto?:number
+    saldo_estoque:any
 
     constructor(newP:Partial<Product>){
         Object.assign(this,newP)
