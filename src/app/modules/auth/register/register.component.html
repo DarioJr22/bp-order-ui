@@ -1,0 +1,164 @@
+<div class="surface-ground flex align-items-center justify-content-center min-h-screen min-w-screen overflow-hidden">
+    <div class="flex flex-column align-items-center justify-content-center">
+        <img src="assets/layout/images/{{layoutService.config().colorScheme === 'light' ? 'logo-dark' : 'logo-white'}}.png"
+            alt="Sakai logo" class="mb-5 w-6rem flex-shrink-0">
+        <div
+            style="border-radius:56px; padding:0.3rem; background: linear-gradient(180deg, var(--primary-color) 10%, rgba(33, 150, 243, 0) 30%);">
+            <div class="w-full surface-card py-8 px-5 sm:px-8" style="border-radius:53px">
+              <div class="text-center mb-5"><!-- 
+                <img src="assets/demo/images/login/avatar.png" alt="Image" height="50" class="mb-3"> -->
+                <div class="text-900 text-3xl font-bold mb-3">Cadastre-se</div>
+                <span class="text-600 font-medium">Insira os dados necessários para o cadastro</span>
+            </div>
+
+                <form #registerForm="ngForm" (ngSubmit)="onSubmit(registerForm)">
+                    <div class="p-fluid form-wapper">
+                      <div class="p-field">
+                        <label for="email">Email</label>
+                        <input
+                          id="email"
+                          type="email"
+                          name="email"
+                          pInputText
+                          ngModel
+                          required
+                          email
+                          #email="ngModel"
+                        />
+                        <small *ngIf="email.invalid && (email.touched || email.dirty)" class="p-error">
+                          <span *ngIf="email.errors?.['required']">Email é obrigatório.</span>
+                          <span *ngIf="email.errors?.['email']">Email inválido.</span>
+                        </small>
+                      </div>
+            
+                      <div class="p-field">
+                        <label for="password">Senha</label>
+                        <p-password
+                          type="password"
+                          name="password"
+                          pInputText
+                          ngModel
+                          required
+                          #password="ngModel"
+                        />
+                        <small *ngIf="password.invalid && (password.touched || password.dirty)" class="p-error">
+                          Senha é obrigatória.
+                        </small>
+                      </div>
+            
+                      <div class="p-field">
+                        <label for="name">Nome</label>
+                        <input id="name" name="name" pInputText ngModel />
+                      </div>
+
+                      <div class="p-field">
+                        <label for="phone">Telefone</label>
+                        <input id="phone" name="phone" pInputText ngModel />
+                      </div>
+                      
+                      <div class="p-field" style=" grid-column:span 2; ">
+                        <label for="username">Username</label>
+                        <input id="username" name="username" required pInputText ngModel #username="ngModel" />
+                        <small *ngIf="username.invalid && (username.touched || username.dirty)" class="p-error">
+                          <span *ngIf="username.errors?.['required']">User Name é obrigatório.</span>
+                          <span *ngIf="username.errors?.['username']">User Name inválido.</span>
+                        </small>
+                      </div>
+
+                     
+            
+                  <!--     <div class="address" ngModelGroup="address">
+                        <div class="p-field">
+                          <label for="street">Rua</label>
+                          <input
+                            id="street"
+                            name="street"
+                            pInputText
+                            ngModel
+                            required
+                            #street="ngModel"
+                          />
+                          <small *ngIf="street.invalid && (street.touched || street.dirty)" class="p-error">
+                            Rua é obrigatória.
+                          </small>
+                        </div>
+            
+                        <div class="p-field">
+                          <label for="number">Número</label>
+                          <input
+                            id="number"
+                            name="number"
+                            pInputText
+                            ngModel
+                            required
+                            #number="ngModel"
+                          />
+                          <small *ngIf="number.invalid && (number.touched || number.dirty)" class="p-error">
+                            Número é obrigatório.
+                          </small>
+                        </div>
+            
+                        <div class="p-field">
+                          <label for="complement">Complemento</label>
+                          <input id="complement" name="complement" pInputText ngModel />
+                        </div>
+            
+                        <div class="p-field">
+                          <label for="city">Cidade</label>
+                          <input
+                            id="city"
+                            name="city"
+                            pInputText
+                            ngModel
+                            required
+                            #city="ngModel"
+                          />
+                          <small *ngIf="city.invalid && (city.touched || city.dirty)" class="p-error">
+                            Cidade é obrigatória.
+                          </small>
+                        </div>
+            
+                        <div class="p-field">
+                          <label for="state">Estado</label>
+                          <input
+                            id="state"
+                            name="state"
+                            pInputText
+                            ngModel
+                            required
+                            #state="ngModel"
+                          />
+                          <small *ngIf="state.invalid && (state.touched || state.dirty)" class="p-error">
+                            Estado é obrigatório.
+                          </small>
+                        </div>
+            
+                        <div class="p-field">
+                          <label for="cep">CEP</label>
+                          <input
+                            id="cep"
+                            name="cep"
+                            pInputText
+                            ngModel
+                            required
+                            #cep="ngModel"
+                          />
+                          <small *ngIf="cep.invalid && (cep.touched || cep.dirty)" class="p-error">
+                            CEP é obrigatório.
+                          </small>
+                        </div>
+                      </div> -->
+            
+                      <p-button
+                        class="register-button"
+                        type="submit"
+                        label="Cadastrar"
+                        [disabled]="registerForm.invalid"
+                      ></p-button>
+                    </div>
+                  </form>
+                   
+            </div>
+        </div>
+    </div>
+</div>   <p-toast key="tst"></p-toast>

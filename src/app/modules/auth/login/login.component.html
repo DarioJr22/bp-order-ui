@@ -1,0 +1,51 @@
+<div class="surface-ground flex align-items-center justify-content-center min-h-screen min-w-screen overflow-hidden"
+
+style="
+        background-image:'https://mms.img.susercontent.com/br-11134216-7r98o-lnbkahfwj9vz42';
+        background-size: auto; 
+        height: 100vh;
+        width: 100vw;">
+    <div class="flex flex-column align-items-center justify-content-center">
+        <img src="assets/layout/images/{{layoutService.config().colorScheme === 'light' ? 'logo-dark' : 'logo-white'}}.png"
+            alt="Sakai logo" class="mb-5 w-6rem flex-shrink-0" style="transform: scale(3);">
+        <div
+            style="border-radius:56px; padding:0.3rem; background: linear-gradient(180deg, var(--primary-color) 10%, rgba(33, 150, 243, 0) 30%);">
+            <div class="w-full surface-card py-8 px-5 sm:px-8" style="border-radius:53px">
+                <div class="text-center mb-5"><!-- 
+                    <img src="assets/demo/images/login/avatar.png" alt="Image" height="50" class="mb-3"> -->
+                    <div class="text-900 text-3xl font-medium mb-3">Bem vindo (a) !</div>
+                    <span class="text-600 font-medium">Insira email e senha para continuar</span>
+                </div>
+
+                <form #loginForm="ngForm" (ngSubmit)="onSubmit(loginForm)">
+                    <div class="flex flex-column mb-4">
+                        <label for="email" class="block text-900 text-xl font-medium mb-2">Email</label>
+                        <input id="email" type="email" name="email" pInputText ngModel required email #email="ngModel"
+                            placeholder="Email address" pInputText class="w-full md:w-30rem " style="padding:1rem">
+                        <small *ngIf="email.invalid && (email.touched || email.dirty)" class="p-error">
+                            <span *ngIf="email.errors?.['required']">Email é obrigatório.</span>
+                            <span *ngIf="email.errors?.['email']">Email inválido.</span>
+                        </small>
+                    </div>
+
+                    <div class="flex flex-column mb-4">
+                        <label for="password1" class="block text-900 font-medium text-xl mb-2">Password</label>
+                        <p-password id="password1" type="password" name="password" pInputText ngModel required
+                            #password="ngModel" placeholder="Password" [toggleMask]="true" 
+                            inputStyleClass="w-full p-3 md:w-30rem"></p-password>
+                        <small *ngIf="password.invalid && (password.touched || password.dirty)" class="p-error">
+                            Senha é obrigatória.
+                        </small>
+                    </div>
+                    <div class="flex align-items-center justify-content-between mb-5 gap-5">
+                        <!-- <div class="flex align-items-center">
+                            <p-checkbox id="rememberme1" [binary]="true" styleClass="mr-2"></p-checkbox>
+                            <label for="rememberme1">Remember me</label>
+                        </div> -->
+                        <a [routerLink]="['/auth/register']" class="font-medium no-underline ml-2 text-right cursor-pointer"
+                            style="color: var(--primary-color)">Não é cadastrado ainda ? Cadastre-se agora. </a>  
+                    </div>
+                    <button pButton pRipple label="Login" class="w-full p-3 text-xl"></button>
+          
+  
+                    <p-toast key="tst"></p-toast>
