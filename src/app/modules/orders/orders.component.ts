@@ -1,6 +1,6 @@
 import { Component, effect, OnInit } from '@angular/core';
 import { BehaviorSubject, tap, switchMap, catchError } from 'rxjs';
-import { Product } from './dto/product';
+import { ProductTinyApi } from './dto/product';
 import { OrdersService } from './orders.service';
 import { ProductSearchReturn, ReturnProductDto } from './dto/returnProduct';
 import { ConfirmationService, MessageService, SelectItem } from 'primeng/api';
@@ -13,6 +13,7 @@ import { AppConfig, LayoutService } from '../../layout/service/app.layout.servic
 import { CookieService } from 'ngx-cookie-service';
 import { CookieServiceImp } from 'src/app/services/coockie.service';
 import { EmailOrder, Order } from './dto/order';
+import { ProductService } from '../product/product.service';
 export class FilterProductDto {
     id: string | string[]
     nome: string | string[]
@@ -84,7 +85,7 @@ export class OrdersComponent implements OnInit {
         }
     );
 
-    productDetail: Product = new Product({
+    productDetail: ProductTinyApi = new ProductTinyApi({
             quantidade: 0
         }
     )
@@ -110,7 +111,8 @@ export class OrdersComponent implements OnInit {
         private sanitizer: DomSanitizer,
         private confirmationService: ConfirmationService,
         private CookieService:CookieServiceImp,
-        public layoutService:LayoutService
+        public layoutService:LayoutService,
+        private productService:ProductService
     ) {
         this.situacaoValues = Object.values(this.situacaoMapper);
         this.orderService.modalState$.subscribe((state:boolean) => {
@@ -126,6 +128,7 @@ export class OrdersComponent implements OnInit {
     ngOnInit() {
         this.getAllProducts();
         this.getImgs('notFoundCart');
+        
 
 
         this.orderService.changeTheme('lara-light-blue', 'light')
@@ -245,9 +248,9 @@ export class OrdersComponent implements OnInit {
     getDetailProduct(id: string) {
         this.viewDialog = true
         this.orderService.isCartLoading.set(true)
-        this.orderService.getProductById(id).subscribe({
-            next: (prod) => {
-                let produto = prod.retorno.produto as Product
+        this.productService.getProductById(id).subscribe({
+            next: (prod:any) => {
+                let produto = prod[0]
                 produto.quantidade = 0
                 this.productDetail = produto
                 this.orderService.isCartLoading.set(false)
@@ -273,10 +276,12 @@ export class OrdersComponent implements OnInit {
         this.orderService.isCartLoading.set(true)
 
 
-        this.orderService.getProductById(id).pipe(tap(() => this.orderService.isCartLoading.set(false))).subscribe({
-            next: (prod) => {
-                let produto = prod.retorno.produto as Product
+        this.productService.getProductById(id).pipe(tap(() => this.orderService.isCartLoading.set(false))).subscribe({
+            next: (prod:any) => {
+                let produto = prod[0]
                 produto.quantidade = quantity // Add the quantity before insert at the cart
+                console.log(prod);
+                
                 this.orderService.addProduct(produto);
 
             }, error: (error) => {
@@ -291,7 +296,10 @@ export class OrdersComponent implements OnInit {
     exportToPdf(){
         this.orderService.isCartLoading.set(true)
         this.setPdfState(true)
-        let cart = this.orderService.productsOnOrder().map(i => i)
+        let cart = this.orderService.productsOnOrder().map(i => {
+            parseFloat(i.preco)
+            return i
+        })
         this.orderService.exportToPdf(cart).pipe(tap(() => this.orderService.isCartLoading.set(false))).subscribe({
             next: (order) => {
                 let orderBlob = order
@@ -489,7 +497,7 @@ export class OrdersComponent implements OnInit {
         this.orderService.removeProduct(id)
     }
 
-    decrementProductFromCart(product:Product,quantity:number) {
+    decrementProductFromCart(product:ProductTinyApi,quantity:number) {
         if (product.quantidade == 1)
             this.removeProductFromCart(product.id)
 

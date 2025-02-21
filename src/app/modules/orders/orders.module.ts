@@ -29,6 +29,7 @@ import { LayoutService } from 'src/app/layout/service/app.layout.service';
 @NgModule({
 
   imports: [
+    CommonModule,
     FormsModule,
     ReactiveFormsModule,
     CommonModule,

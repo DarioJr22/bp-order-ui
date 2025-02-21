@@ -2,10 +2,11 @@ import { computed, Injectable, signal, effect, WritableSignal, Signal, OnInit } 
 import { HttpClient } from '@angular/common/http';
 import { EmailOrder, Order } from './dto/order';
 import { ProductSearchReturn, ReturnProductDto } from './dto/returnProduct';
-import { Product } from './dto/product';
+import { ProductTinyApi } from './dto/product';
 import { CookieServiceImp } from 'src/app/services/coockie.service';
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { LayoutService } from 'src/app/layout/service/app.layout.service';
+import { URL } from 'src/app/services/constants';
 
 @Injectable({
   providedIn: 'root'
@@ -23,19 +24,20 @@ export class OrdersService {
     })
   }
 
-//'https://bp-order-api-production.up.railway.app'
+//'https://bp-order-api-production-31fb.up.railway.app'
 //http://localhost:3000
 
-  url = 'https://bp-order-api-production.up.railway.app'
+url = URL
+
 
   //Produtos no carrinho
-  productsOnOrder:WritableSignal<Product[]> = signal<Product[]>([])
+  productsOnOrder:WritableSignal<ProductTinyApi[]> = signal<ProductTinyApi[]>([])
 
   //Numero de produtos no carrinho
   cart:Signal<number> = computed(() =>  this.productsOnOrder().length)
 
   //Signal readOnly de produtos no carrinho
-  products:Signal<Product[]> = computed(() => this.productsOnOrder())
+  products:Signal<ProductTinyApi[]> = computed(() => this.productsOnOrder())
 
   //Estado de carregamento do carrinho
   isCartLoading:WritableSignal<boolean> = signal<boolean>(false)
@@ -44,7 +46,7 @@ export class OrdersService {
   printPdf:WritableSignal<boolean> = signal<boolean>(false)
 
 
-  addProduct(product: Product): void {
+  addProduct(product: ProductTinyApi): void {
     this.productsOnOrder.update(products => {
        //If is a new product
        if(!products.some(prds => prds.id == product.id ))
@@ -58,7 +60,7 @@ export class OrdersService {
     });
   }
 
-  decrementProductQuantity(product: Product,quantity:number): void {
+  decrementProductQuantity(product: ProductTinyApi,quantity:number): void {
     this.productsOnOrder.update(products => {
 
         let idx = products.findIndex(prd => prd.id == product.id);
@@ -96,14 +98,14 @@ export class OrdersService {
   }
 
   getProductById(id:string){
-    return this.http.get<{retorno:{produto:Product}}>(`${this.url}/product/${id}`)
+    return this.http.get<{retorno:{produto:ProductTinyApi}}>(`${this.url}/product/${id}`)
   }
 
   getSearchFields(){
-    return this.http.get<any>(`${this.url}/product/fields/getter`)
+    return this.http.get<any>(`${this.url}/product/fields/getter?token=0c3865c5117c9e7e6e40e652bb91175bbde51c71`)
   }
 
-  exportToPdf(products:Product[]):Observable<Blob>{
+  exportToPdf(products:ProductTinyApi[]):Observable<Blob>{
 
     const httpOptions = {
         responseType: 'blob' as 'json', // Informamos ao HttpClient que queremos um Blob como resposta
@@ -112,7 +114,7 @@ export class OrdersService {
     return this.http.post<Blob>(`${this.url}/report/pdf`,products,httpOptions)
   }
 
-  exportToExcel(products:Product[]){
+  exportToExcel(products:ProductTinyApi[]){
 
     const httpOptions = {
         responseType: 'blob' as 'json', // Informamos ao HttpClient que queremos um Blob como resposta

@@ -21,11 +21,12 @@
                                         <div class="p-3 border-round-sm surface-100">
                                             <span class="text-400">ID</span>
                                             <!-- Multi select - Id -  -->
-                                            <p-multiSelect
+                                            <input
+                                            pInputText
                                             [options]="filterProductLists['id']"
                                             [(ngModel)]="filterProductDto['id']"
                                             (click)="tst(filterProductDto)"
-                                            (onChange)="applyFilter()"
+                                            (keyup)="applyFilter()"
                                             [filter]="true"
                                             optionLabel="id"
                                             optionValue="id"
@@ -40,10 +41,11 @@
                                         <div class="p-3 border-round-sm surface-100">
                                             <span class="text-400">Nome</span>
                                             <!-- Multi select - Nome -->
-                                            <p-multiSelect
+                                            <input
+                                            pInputText
                                             [options]="filterProductLists['nome']"
                                             [(ngModel)]="filterProductDto['nome']"
-                                            (onChange)="applyFilter()"
+                                            (keyup)="applyFilter()"
                                             [filter]="true"
                                             optionLabel="nome"
                                             optionValue="nome"
@@ -56,12 +58,13 @@
 
                                     <div class="col-12 md:col-12 lg:col-4">
                                         <div class="p-3 border-round-sm surface-100">
-                                            <span class="text-400">Código</span>
+                                            <span class="text-400">SKU</span>
                                             <!-- Multi select    - Código -->
-                                            <p-multiSelect
+                                            <input
+                                            pInputText
                                             [options]="filterProductLists['codigo']"
                                             [(ngModel)]="filterProductDto['codigo']"
-                                            (onChange)="applyFilter()"
+                                            (keyup)="applyFilter()"
                                             [filter]="true"
                                             optionLabel="codigo"
                                             optionValue="codigo"
@@ -471,9 +474,9 @@
 
                     <span class="flex column-gap-3 xl:flex-row column-gap-1 md:flex-column row-gap-1">
                     <p-image
-                    [src]="productDetail['productDetail'] &&
-                    productDetail['productDetail'].length > 0 ?
-                    productDetail['productDetail'][0]
+                    [src]="product['anexos'] &&
+                    product['anexos'].length > 0 ?
+                    product['anexos'][0]
                     :'../../../assets/layout/images/prd.png'
                     "
                     alt="Image"
