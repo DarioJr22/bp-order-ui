@@ -10,6 +10,8 @@ import { AppLayoutComponent } from "./layout/app.layout.component";
                 path: 'funcao', component: AppLayoutComponent,
                 children: [
                     { path: 'pedido', loadChildren: () => import('./modules/orders/orders.module').then(m => m.OrdersModule) },
+                    {path: 'detail-user', loadChildren:()=> import('./modules/auth/detail-user/detail-user.module').then(m => m.DetailUserModule)},
+                    {path: 'produto', loadChildren:()=> import('./modules/product/product.module').then(m => m.ProductModule)},
                    /*  { path: 'uikit', loadChildren: () => import('./demo/components/uikit/uikit.module').then(m => m.UIkitModule) },
                     { path: 'utilities', loadChildren: () => import('./demo/components/utilities/utilities.module').then(m => m.UtilitiesModule) },
                     { path: 'documentation', loadChildren: () => import('./demo/components/documentation/documentation.module').then(m => m.DocumentationModule) },
@@ -17,7 +19,7 @@ import { AppLayoutComponent } from "./layout/app.layout.component";
                     { path: 'pages', loadChildren: () => import('./demo/components/pages/pages.module').then(m => m.PagesModule) } */
                 ]
             },
-            { path: 'auth', loadChildren: () => import('./demo/components/auth/auth.module').then(m => m.AuthModule) },
+            { path: 'auth', loadChildren: () => import('./modules/auth/auth.module').then(m => m.AuthModule) },
             { path: '', loadChildren: () => import('./demo/components/landing/landing.module').then(m => m.LandingModule) },
             { path: 'notfound', component: NotfoundComponent },
             { path: '**', redirectTo: '/notfound' },

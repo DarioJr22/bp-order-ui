@@ -1,5 +1,5 @@
-import { NgModule } from '@angular/core';
-import { HashLocationStrategy, LocationStrategy, PathLocationStrategy } from '@angular/common';
+import { DEFAULT_CURRENCY_CODE, NgModule } from '@angular/core';
+import { CommonModule, DATE_PIPE_DEFAULT_OPTIONS, HashLocationStrategy, LocationStrategy, PathLocationStrategy } from '@angular/common';
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
 import { AppLayoutModule } from './layout/app.layout.module';
@@ -47,6 +47,8 @@ const cookieConfig: NgcCookieConsentConfig = {
     ],
     providers: [
         { provide: LocationStrategy, useClass: PathLocationStrategy },
+        {provide:DEFAULT_CURRENCY_CODE, useValue:'BRL'},
+        {provide:DATE_PIPE_DEFAULT_OPTIONS, useValue:{dateFormat:'dd/MM/yyyy hh:mm:ss'}},
         CountryService, CustomerService, EventService, IconService, NodeService,
         PhotoService, ProductService
     ],

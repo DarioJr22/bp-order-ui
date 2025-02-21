@@ -26,6 +26,7 @@
         "@fullcalendar/daygrid": "^6.0.3",
         "@fullcalendar/interaction": "^6.0.3",
         "@fullcalendar/timegrid": "^6.0.3",
+        "@swimlane/ngx-charts": "^22.0.0-alpha.0",
         "bp-order-handler": "file:",
         "chart.js": "^3.3.2",
         "ngx-cookie-service": "^17.1.0",

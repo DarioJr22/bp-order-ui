@@ -1,9 +1,9 @@
-export class Product {
+export class ProductTinyApi {
     id?: string;
     nome?: string;
     codigo?: string;
     unidade?: string;
-    preco?: number;
+    preco?: string;
     preco_promocional?: number;
     ncm?: string;
     origem?: string;
@@ -58,7 +58,7 @@ export class Product {
     desconto?:number
     saldo_estoque:any
 
-    constructor(newP:Partial<Product>){
+    constructor(newP:Partial<ProductTinyApi>){
         Object.assign(this,newP)
     }
 

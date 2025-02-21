@@ -1,6 +1,6 @@
 import { Injectable } from "@angular/core";
 import { CookieService } from 'ngx-cookie-service';
-import { Product } from "../modules/orders/dto/product";
+import { ProductTinyApi } from "../modules/orders/dto/product";
 
 
 @Injectable({
