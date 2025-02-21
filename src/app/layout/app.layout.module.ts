@@ -2,7 +2,6 @@ import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { InputTextModule } from 'primeng/inputtext';
 import { SidebarModule } from 'primeng/sidebar';
 import { BadgeModule } from 'primeng/badge';
@@ -19,6 +18,8 @@ import { AppSidebarComponent } from "./app.sidebar.component";
 import { AppLayoutComponent } from "./app.layout.component";
 import { ConfirmationService } from 'primeng/api';
 import { ConfirmPopupModule } from 'primeng/confirmpopup';
+import { ButtonModule } from 'primeng/button';
+import { CommonModule } from '@angular/common';
 
 @NgModule({
     declarations: [
@@ -30,10 +31,10 @@ import { ConfirmPopupModule } from 'primeng/confirmpopup';
         AppLayoutComponent,
     ],
     imports: [
-        BrowserModule,
+        CommonModule,
         FormsModule,
         HttpClientModule,
-        BrowserAnimationsModule,
+        BrowserModule,
         InputTextModule,
         SidebarModule,
         BadgeModule,
@@ -43,7 +44,8 @@ import { ConfirmPopupModule } from 'primeng/confirmpopup';
         RouterModule,
         AppConfigModule,
         BadgeModule,
-        ConfirmPopupModule
+        ConfirmPopupModule,
+        ButtonModule
     ],
     exports: [AppLayoutComponent],
     providers:[ConfirmationService]

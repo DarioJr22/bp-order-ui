@@ -46,7 +46,7 @@
         </button>
 
         <!-- Carrinho abaixo de 0 é carrinho normal -->
-        <button class="p-link layout-topbar-button" (click)="seiOqueLla()">
+        <button class="p-link layout-topbar-button" (click)="abrirCarrinho()">
             <i
             *ngIf="cartCount > 0"
             class="pi pi-shopping-cart"
@@ -60,11 +60,31 @@
             <span class="subtitle">Carrinho</span>
         </button>
 
-        <button (click)="emBreve($event,'Perfil de usuário')" class="p-link layout-topbar-button">
+        <button (click)=" this.user.logado ? 
+        detalhamentoUsuario() :
+        loginQuestion($event)
+        " class="p-link layout-topbar-button">
             <i class="pi pi-user"></i>
-            <span class="subtitle">Profile</span>
+            <span class="subtitle">Perfil</span>
         </button>
-        <p-confirmPopup key="confirm2"></p-confirmPopup>
+        <p-confirmPopup #confirmPopupRef>
+            <ng-template pTemplate="headless" let-message let-test>
+                <div class="border-round p-3">
+                    <span>{{ message.message }}</span>
+                    <div class="flex align-items-center gap-2 mt-3">
+                        <p-button (onClick)="accept()" label="Login" size="small" />
+                        <p-button (onClick)="reject()" label="Continuar desconectado" severity="danger" [outlined]="true" size="small" />
+                    </div>
+                </div>
+            </ng-template>
+        </p-confirmPopup>
+
+        <button *ngIf="this.user.logado" (click)=" outSystem()
+        " class="p-link layout-topbar-button">
+            <i class="pi pi-power-off"></i>
+            <span class="subtitle">Sair</span>
+        </button>
+
     </div>
 
 
