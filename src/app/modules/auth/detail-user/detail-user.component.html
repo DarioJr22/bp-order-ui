@@ -5,16 +5,21 @@
             style="background: linear-gradient(0deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.2)), radial-gradient(77.36% 256.97% at 77.36% 57.52%, #EEEFAF 0%, #C3E3FA 100%); clip-path: ellipse(150% 87% at 93% 13%);">
             <div class="profile">
                 <span>
-                    <p-avatar 
-                    image="https://primefaces.org/cdn/primeng/images/demo/avatar/amyelsner.png" 
-                    styleClass="mr-2" 
-                    size="xlarge" 
-                    shape="circle" />
-                    <p-button  class="icon-profilephoto" icon="pi pi-pencil" [rounded]="true"  (click)="previeusUserPage()" />
+                    <div class="photo-upload-container">
+                        <div class="image-preview">
+                          <img [src]="imagePreview || 'assets/demo/images/access/userdefault.png'" alt="Preview" class="preview-image">
+                          <label for="fileInput" class="edit-icon">
+                            <span class="pencil-icon">✏️</span> <!-- Ícone de lápis -->
+                          </label>
+                        </div>
+
+                      </div>
+                      
                 </span>
+                <input type="file" id="fileInput" (change)="onFileSelected($event)" accept="image/*" style="display: none;">
             </div>
-                <form #updateProfile (ngSubmit)="updateProfile(updateProfile)" class="formLayout">
-                    <div class="flex flex-column mb-4">
+                <form #myForm="ngForm" (ngSubmit)="updateUser()" class="formLayout">
+                   <!--  <div class="flex flex-column mb-4">
                         <label 
                         for="username" 
                         class="block text-900 font-medium text-xl mb-2">
@@ -28,12 +33,12 @@
                         pInputText 
                         ngModel 
                         required
-                        #password="ngModel" 
+                        #username="ngModel" 
                         placeholder="username" 
                         pInputText 
                         inputStyleClass="w-full p-3 md:w-30rem"/>
                        
-                    </div>
+                    </div> -->
 
                     <div class="flex flex-column mb-4">
                         <label 
@@ -49,7 +54,7 @@
                         pInputText 
                         ngModel 
                         required
-                        #password="ngModel" 
+                        #name="ngModel" 
                         placeholder="name" 
                         pInputText 
                         inputStyleClass="w-full p-3 md:w-30rem"/>
@@ -68,17 +73,21 @@
                         pInputText 
                         ngModel 
                         required
-                        #password="ngModel" 
+                        #email="ngModel" 
                         placeholder="email" 
                         pInputText 
                         inputStyleClass="w-full p-3 md:w-30rem"/>
                      </div>
 
-                     <p-button
-                        class="submitButton"
+                     <div style="width: 100%; display: flex; justify-content: center;">
+
+                        <p-button
+                        class="w-100"
                         type="submit"
-                        label="Atualizar perwfil"
+                        label="Atualizar perfil"
                       ></p-button>
+                     </div>
+
                 </form>
             
         </div>
@@ -87,7 +96,7 @@
             <div *ngFor="let user of usersList;index as y">
                 <p-card [header]="user.name" [subHeader]="user.username" [style]="{width: '300px'}">
                     <ng-template pTemplate="header">
-                        <img alt="Card" src="https://primefaces.org/cdn/primeng/images/card-ng.jpg" />
+                        <img alt="Card" width="150px" height="230px" [src]="user.profilePicture || 'assets/demo/images/access/userdefault.png'" />
                     </ng-template>
             
                 </p-card>
@@ -98,32 +107,32 @@
         <div class="flex justify-content-center">
             <span>
 
-                <p-button icon="pi pi-arrow-left" [rounded]="true" [text]="true" (click)="previeusUserPage()" />
-                <p-button icon="pi pi-arrow-right" [rounded]="true" [text]="true" (click)="nextUserPage()" />
+                <p-button icon="pi pi-arrow-left" [rounded]="true" [text]="true" (click)="this.pageUser.page >= 0 ? previeusUserPage() : 0 " />
+                <p-button icon="pi pi-arrow-right" [rounded]="true" [text]="true" (click)="this.pageUser.page < 2 ? nextUserPage() : 0" />
             </span>
         </div>
         <div id="charts" class="py-4 px-4 lg:px-8 mt-5 mx-0 lg:mx-8">
 
             <span class="flex flex-column align-items-center">
-                <h3>Engajamento de usuários</h3>
+                <h3 class="font-bold">Engajamento de usuários</h3>
                 <h6>Métricas chave de engajamento</h6>    
             </span>
-             <ngx-charts-line-chart
-                [view]="view"
-                [scheme]="colorScheme"
-                [legend]="legend"
-                [showXAxisLabel]="showXAxisLabel"
-                [showYAxisLabel]="showYAxisLabel"
-                [xAxis]="xAxis"
-                [yAxis]="yAxis"
-                [xAxisLabel]="xAxisLabel"
-                [yAxisLabel]="yAxisLabel"
-                [timeline]="timeline"
-                [results]="multi"
-                (select)="onSelect($event)"
-                (activate)="onActivate($event)"
-                (deactivate)="onDeactivate($event)">
-                </ngx-charts-line-chart>
+            <ngx-charts-bar-horizontal
+            [view]="view"
+            [scheme]="colorScheme"
+            [results]="single"
+            [gradient]="gradient"
+            [xAxis]="showXAxis"
+            [yAxis]="showYAxis"
+            [legend]="showLegend"
+            [showXAxisLabel]="showXAxisLabel"
+            [showYAxisLabel]="showYAxisLabel"
+            [xAxisLabel]="xAxisLabel"
+            [yAxisLabel]="yAxisLabel"
+            (select)="onSelect($event)"
+            (activate)="onActivate($event)"
+            (deactivate)="onDeactivate($event)">
+          </ngx-charts-bar-horizontal>
         </div>
 
         <div id="totalCards flex lg: col-gap md:flex-column">
@@ -135,7 +144,7 @@
             </span>
         </div>
 
-        <div id="topProduct" class="py-4 px-4 lg:px-8 mx-0 my-6 lg:mx-8">
+        <!-- <div id="topProduct" class="py-4 px-4 lg:px-8 mx-0 my-6 lg:mx-8">
             <div *ngFor="let user of usersList;index as y">
                 <p-card [header]="user.name" [subHeader]="user.username" [style]="{width: '300px'}">
                     <ng-template pTemplate="header">
@@ -143,7 +152,8 @@
                     </ng-template>
         
                 </p-card>
-        </div>
+        </div> -->
 
     </div>
 </div>
+<p-toast key="tst"></p-toast>

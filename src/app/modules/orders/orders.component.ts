@@ -14,6 +14,8 @@ import { CookieService } from 'ngx-cookie-service';
 import { CookieServiceImp } from 'src/app/services/coockie.service';
 import { EmailOrder, Order } from './dto/order';
 import { ProductService } from '../product/product.service';
+import { LogService, TipoAcao } from 'src/app/services/logacesso.service';
+import { AuthService, User } from '../auth/auth.service';
 export class FilterProductDto {
     id: string | string[]
     nome: string | string[]
@@ -112,7 +114,9 @@ export class OrdersComponent implements OnInit {
         private confirmationService: ConfirmationService,
         private CookieService:CookieServiceImp,
         public layoutService:LayoutService,
-        private productService:ProductService
+        private productService:ProductService,
+        private auth:AuthService,
+        private logAcessService:LogService
     ) {
         this.situacaoValues = Object.values(this.situacaoMapper);
         this.orderService.modalState$.subscribe((state:boolean) => {
@@ -245,9 +249,12 @@ export class OrdersComponent implements OnInit {
     /* Cart */
 
 
-    getDetailProduct(id: string) {
+    getDetailProduct(produto: any) {
+        let id = produto.id
         this.viewDialog = true
         this.orderService.isCartLoading.set(true)
+        this.createLogProduto(TipoAcao.CLIQUE,produto)
+        this.createLogProduto(TipoAcao.DETALHEPRODUTO,produto)
         this.productService.getProductById(id).subscribe({
             next: (prod:any) => {
                 let produto = prod[0]
@@ -272,9 +279,11 @@ export class OrdersComponent implements OnInit {
 
 
 
-    addToCart(id: string, quantity: number) {
+    addToCart(product:any, quantity: number) {
         this.orderService.isCartLoading.set(true)
-
+        let id = product.id
+        this.createLogProduto(TipoAcao.CLIQUE,product)
+        this.createLogProduto(TipoAcao.PRODUTONOCARRINHO,product)
 
         this.productService.getProductById(id).pipe(tap(() => this.orderService.isCartLoading.set(false))).subscribe({
             next: (prod:any) => {
@@ -298,7 +307,9 @@ export class OrdersComponent implements OnInit {
         this.setPdfState(true)
         let cart = this.orderService.productsOnOrder().map(i => {
             parseFloat(i.preco)
+            this.createLogProduto(TipoAcao.EXPORTARPEDIDO,i)
             return i
+
         })
         this.orderService.exportToPdf(cart).pipe(tap(() => this.orderService.isCartLoading.set(false))).subscribe({
             next: (order) => {
@@ -393,6 +404,11 @@ export class OrdersComponent implements OnInit {
     exportToExcel(){
         this.orderService.isCartLoading.set(true)
         let cart = this.orderService.productsOnOrder().map(i => i)
+        cart.map(i =>{
+            this.createLogProduto(TipoAcao.EXPORTARPEDIDO,i)
+        })
+
+
         this.orderService.exportToExcel(cart).pipe(tap(() => this.orderService.isCartLoading.set(false))).subscribe({
             next: (order) => {
                 const blob = new Blob([order], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
@@ -468,7 +484,10 @@ export class OrdersComponent implements OnInit {
         console.log('Valor digitado:', this.inputValue);
 
         //Calculate order and send
-        let cart = this.orderService.productsOnOrder().map(i => i);
+        let cart = this.orderService.productsOnOrder().map(i => {
+            parseFloat(i.preco)
+            return i
+        });
         let order = new Order({products:cart});
         let orderEmail = new EmailOrder();
             Object.assign(orderEmail,order);
@@ -476,10 +495,14 @@ export class OrdersComponent implements OnInit {
 
 
         if((this.inputValue) && (this.inputValue != null)){
-                this.orderService.sendToEmail(orderEmail).subscribe(()=>{
+                this.orderService.sendToEmail(orderEmail).subscribe({next:()=>{
                     this.showSuccessViaToast('Pedido enviado ao email do vendedor')
                     this.display = false;
-                });
+                },
+                error:(error)=>{
+                    this.showErrorViaToast('Erro ao enviar por email')
+                }}
+            );
             }else{
                 this.showErrorViaToast('Insira um valor válido para enviar o email')
             }
@@ -548,5 +571,21 @@ export class OrdersComponent implements OnInit {
 
     counterArray(n: number): any[] {
         return Array(n);
+    }
+
+    //LOG
+    createLogProduto(TipoAcao:TipoAcao,product?:any){
+        let usuario:User = this.auth.getUser()
+        if(this.auth.verifyIfItsLoggedIn()){
+            usuario  =  this.auth.getCoockieUser()
+        }
+        this.logAcessService.createLog(TipoAcao,usuario.id,product.id).subscribe({
+          next:(log)=>{
+        
+
+          }  
+        })
+        
+        
     }
 }

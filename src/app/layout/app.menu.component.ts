@@ -28,9 +28,18 @@ export class AppMenuComponent implements OnInit {
             {
                 label: 'Usuário',
                 items: [
-                    { label: 'Usuário', icon: 'pi pi-fw pi-user', routerLink: ['/funcao/detail-user'] },
+                    { label: 'Usuário', icon: 'pi pi-fw pi-user', routerLink: ['/funcao/detail-user'], visible:this.auth.verifyIfItsLoggedIn()},
                 ]
             },
         ];
+        this.excludeFromMenu()
+    }
+
+    excludeFromMenu(){
+        this.model.forEach((menuSection,index) => {
+            if(menuSection.items.every( item => !item.visible)){
+                this.model.splice(index,1);
+            }
+        })
     }
 }

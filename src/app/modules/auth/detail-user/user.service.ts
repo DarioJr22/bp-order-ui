@@ -17,4 +17,12 @@ export class UserService{
     getPagedUsers(page:number,limit:number):Observable<SimplePage<User>>{
        return this.http.get<SimplePage<User>>(`${URL}/user?page=${page}&limit=${limit}`)
     }
+
+    updateUser(id:string,userUpdate:any){
+        return this.http.put(`${URL}/user/${id}?${id}`,userUpdate)
+    }
+
+    getUserById(id){
+        return this.http.get(`${URL}/user/${id}`)
+    }
 }

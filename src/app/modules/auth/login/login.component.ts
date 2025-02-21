@@ -40,7 +40,7 @@ export class LoginComponent {
                 this.showInfoViaToast('Login bem sucedido !')
                 this.router.navigate(['/funcao/pedido']); // Redireciona para a página inicial
                 //TODO - Armazenar usuário e autentcação
-                
+                response.profilePicture = ""
                 this.authService.setUser(response)
               }else{
                 this.showInfoViaToast('Credênciais inválidas !')

@@ -12,7 +12,6 @@ export interface User {
   name?: string;
   role?:string;
   username?:string;
-  profilePicture?:string;
 }
 
 @Injectable({
@@ -32,7 +31,10 @@ export class AuthService {
       this.loggedUser.update((actualUser) => {
         Object.assign(actualUser,newUser)
         actualUser.logado = true
-        this.coockie.set('userLogged',JSON.stringify(actualUser))       
+        console.log(actualUser);
+        
+        this.coockie.set('userLogged',JSON.stringify(actualUser))   
+        
         return actualUser
       })
     }

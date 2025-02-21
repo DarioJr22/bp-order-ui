@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { LayoutService } from 'src/app/layout/service/app.layout.service';
 import { AuthService, User } from '../auth.service';
@@ -27,7 +27,10 @@ export class DetailUserComponent implements OnInit {
     
     */
 
-    form:NgForm;
+    @ViewChild('myForm') form:NgForm;
+    user:any
+
+    //ADMIN
     usersList:User[] 
     pageUser = {
       page:1,
@@ -35,13 +38,60 @@ export class DetailUserComponent implements OnInit {
     }
 
     constructor(public layoutService: LayoutService,
-        private authService:AuthService,
+        private auth:AuthService,
         private router:Router,
         private userService:UserService,
         private messageService: MessageService
     ) {}
   ngOnInit(): void {
+    this.loggedInUser();
+    this.isAdmin()
+  }
+
+  isAdmin(){
+    this.auth.isAdmin() ? this.adminChargeUser() : this.clientChargeUser()
+  }
+
+  loggedInUser(){
+    if(this.auth.verifyIfItsLoggedIn()){
+      this.user  =  this.auth.getCoockieUser()
+      this.fillUserData()
+    }else{
+      this.router.navigate(['funcao/pedido'])
+    }
+  }
+
+  fillUserData(){
+    setTimeout(()=>{
+      this.form.setValue({
+        email:this.user.email,
+     //   username:this.user.username,
+        name:this.user.name
+      })
+
+
+      this.userService.getUserById(this.user.id).subscribe((user:any)=>{
+        this.imagePreview = user.profilePicture
+        
+      })
+
+      
+      console.log(this.user);
+
+      
+      console.log(this.form);
+    })
+  
+
+   
+  }
+
+  adminChargeUser(){
     this.getUsers(this.pageUser.page,this.pageUser.limit)
+  }
+
+  clientChargeUser(){
+
   }
 
     
@@ -49,16 +99,17 @@ export class DetailUserComponent implements OnInit {
     updateProfile(form: NgForm) {
         if (form.valid) {
           const { email, password } = form.value;
-          this.authService.login(email, password).subscribe({
+          this.auth.login(email, password).subscribe({
             next: (response) => {
               console.log('Login bem-sucedido:', response);
 
               if(response.usuarioValido){
                 this.showInfoViaToast('Login bem sucedido !')
                 this.router.navigate(['/funcao/pedido']); // Redireciona para a página inicial
+                
                 //TODO - Armazenar usuário e autentcação
                 
-                this.authService.setUser(response)
+                this.auth.setUser(response)
               }else{
                 this.showInfoViaToast('Credênciais inválidas !')
               }
@@ -91,9 +142,34 @@ export class DetailUserComponent implements OnInit {
           this.usersList = data.data
         },
         error:()=>{
-          this.showErrorViaToast('Erro ao recuperar usuários')
+          /* this.showErrorViaToast('Erro ao recuperar usuários') */
         }
       })
+    }
+
+    updateUser(){
+
+     let {email,username, name} = this.form.value
+     console.log(this.form.value);
+     
+     this.user.email = email
+     //this.user.username = username
+     this.user.name = name
+     this.user.profilePicture = this.imagePreview
+      this.userService.updateUser(`${this.user.id}`,this.user).subscribe(
+        {
+          next:(usuario:any)=>{
+            this.showInfoViaToast('Usuário atualizado.')
+            this.showInfoViaToast(JSON.stringify(usuario))
+            delete usuario.profilePicture
+            this.auth.setUser(usuario)
+            this.user  =  this.auth.getCoockieUser()
+          },
+          error:(erro)=>{
+            this.showErrorViaToast('Erro ao atualizar usuário.')
+          }
+        }
+      )
     }
 
 
@@ -111,73 +187,12 @@ export class DetailUserComponent implements OnInit {
   }
 
   //Gráfico
-   multi = [
-    {
-      "name": "Germany",
-      "series": [
-        {
-          "name": "1990",
-          "value": 62000000
-        },
-        {
-          "name": "2010",
-          "value": 73000000
-        },
-        {
-          "name": "2011",
-          "value": 89400000
-        }
-      ]
-    },
-  
-    {
-      "name": "USA",
-      "series": [
-        {
-          "name": "1990",
-          "value": 250000000
-        },
-        {
-          "name": "2010",
-          "value": 309000000
-        },
-        {
-          "name": "2011",
-          "value": 311000000
-        }
-      ]
-    },
-  
-    {
-      "name": "France",
-      "series": [
-        {
-          "name": "1990",
-          "value": 58000000
-        },
-        {
-          "name": "2010",
-          "value": 50000020
-        },
-        {
-          "name": "2011",
-          "value": 58000000
-        }
-      ]
-    },
-    {
-      "name": "UK",
-      "series": [
-        {
-          "name": "1990",
-          "value": 57000000
-        },
-        {
-          "name": "2010",
-          "value": 62000000
-        }
-      ]
-    }
+   single = [
+    { "name": "cliqueproduto", "value": 30 },
+    { "name": "carrinhoproduto", "value": 25 },
+    { "name": "entrarplataforma", "value": 15 },
+    { "name": "detalheproduto", "value": 5 },
+    { "name": "exportarpedido", "value": 8 }
   ];
   
   view: any[] = [700, 300];
@@ -191,6 +206,12 @@ export class DetailUserComponent implements OnInit {
   xAxisLabel: string = 'Year';
   yAxisLabel: string = 'Population';
   timeline: boolean = true;
+   // options
+   showXAxis: boolean = true;
+   showYAxis: boolean = true;
+   gradient: boolean = false;
+   showLegend: boolean = true;
+  
   colorScheme = {
     domain: ['#5AA454', '#E44D25', '#CFC0BB', '#7aa3e5', '#a8385d', '#aae3f5']
   };  
@@ -207,4 +228,54 @@ export class DetailUserComponent implements OnInit {
     console.log('Deactivate', JSON.parse(JSON.stringify(data)));
   }
 
+  imagePreview: string | ArrayBuffer | null = null;
+
+  onFileSelected(event: any): void {
+    const file: File = event.target.files[0];
+    if (file) {
+      // Gera a pré-visualização da imagem
+      const reader = new FileReader();
+      reader.onload = () => {
+        this.imagePreview = reader.result;
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+
+
+  //obtenção e tratamento de logs TODO 
+
+  // Método para processar os dados brutos e transformá-los no formato do ngx-charts
+  processData(rawData: any[]): { name: string, value: number }[] {
+    // Objeto para armazenar a contagem de cada ação
+    const actionCounts: { [key: string]: number } = {};
+
+    // Contar as ocorrências de cada ação
+    rawData.forEach(entry => {
+      const action = entry.acao;
+      if (actionCounts[action]) {
+        actionCounts[action]++;
+      } else {
+        actionCounts[action] = 1;
+      }
+    });
+
+    // Transformar o objeto em um array no formato esperado pelo ngx-charts
+    const result = Object.keys(actionCounts).map(action => ({
+      name: action,
+      value: actionCounts[action]
+    }));
+
+    return result;
+
+    /*  rawData = [
+    { id: 1, acao: 'cliqueproduto', data: '2025-02-21 13:15:38.416', userId: 4, productId: 797 },
+    { id: 2, acao: 'cliqueproduto', data: '2025-02-21 13:15:50.619', userId: 4, productId: 797 },
+    { id: 3, acao: 'cliqueproduto', data: '2025-02-21 13:18:14.258', userId: 4, productId: 797 },
+    { id: 4, acao: 'carrinhoproduto', data: '2025-02-21 13:18:14.374', userId: 4, productId: 797 },
+    // Adicione os demais dados aqui...
+  ]; */
+  }
+
+  
 }
