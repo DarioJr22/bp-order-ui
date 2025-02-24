@@ -65,3 +65,13 @@ export enum Role{
   CLIENT = 'client',
 
 }
+
+const STORE_DATABASE_MAPPER = {
+  'BRAVAN':"BRAVAN COMÉRCIO DE PEÇAS E ACESSÓRIOS PARA MOTOCILCTA LTDA",
+  'PLANET':"Bitencourt Soluções Financeira e Moto Parts LTDA "
+}
+
+export const STORE_DATABASE_MAPPER_TO = {
+  'BRAVAN COMÉRCIO DE PEÇAS E ACESSÓRIOS PARA MOTOCILCTA LTDA':"BRAVAN",
+  'Bitencourt Soluções Financeira e Moto Parts LTDA ':"PLANET"
+}

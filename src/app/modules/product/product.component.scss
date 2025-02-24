@@ -10,8 +10,20 @@
     width: 100%;
 }
 
+.layout-wrapper{
+    border-radius: 2rem;
+    -webkit-box-shadow: 3px 1px 17px -6px rgba(122,122,122,1);
+    -moz-box-shadow: 3px 1px 17px -6px rgba(122,122,122,1);
+    box-shadow: 3px 1px 17px -6px rgba(122,122,122,1);
+}
+
 #userData{
     width: 100%;
+    min-height: 100vh;
+    -webkit-box-shadow: 3px 1px 17px -6px rgba(122,122,122,1);
+    -moz-box-shadow: 3px 1px 17px -6px rgba(122,122,122,1);
+    box-shadow: 3px 1px 17px -6px rgba(122,122,122,1);
+    border-radius: 10px;
     .profile{
       width: 100%;
       display: flex;

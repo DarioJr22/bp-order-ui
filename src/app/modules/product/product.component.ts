@@ -1,15 +1,15 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { LayoutService } from 'src/app/layout/service/app.layout.service';
 import { Router } from '@angular/router';
-import { MessageService } from 'primeng/api';
+import { MessageService, SelectItem } from 'primeng/api';
 import { ProductService } from './product.service';
 import { SimplePage } from '../auth/detail-user/paged-user';
 import { AuthService, User } from '../auth/auth.service';
 import { ProductTinyApi } from '../orders/dto/product';
 import { Product } from './dto/product';
 import { ProductSearchReturn } from '../orders/dto/returnProduct';
-import { CLASSPRODUCT_DATABASE_MAPPER, PRICE_STATUS, ProducPricing, ProdutoStatus, Role } from 'src/app/services/constants';
+import { CLASSPRODUCT_DATABASE_MAPPER, PRICE_STATUS, ProducPricing, ProdutoStatus, Role, STORE_DATABASE_MAPPER_TO } from 'src/app/services/constants';
 import { BehaviorSubject, switchMap } from 'rxjs';
 
 @Component({
@@ -37,6 +37,7 @@ export class ProductsComponent implements OnInit {
     ]
     products: Product[] =  [];
     products$:BehaviorSubject<Product[]> = new BehaviorSubject([])
+    @ViewChild('scrollContainer') scrollContainer!: ElementRef; 
     price_status = PRICE_STATUS
     pageUser = {
       page:1,
@@ -58,6 +59,64 @@ export class ProductsComponent implements OnInit {
   ngOnInit(): void {
     this.isUserLoggedIn()
     this.getAllProducts()
+  }
+
+  scrollToEnd() {
+    const container = this.scrollContainer.nativeElement;
+    container.scrollTo({
+        right: container.scrollWidth, // Rola até o final
+        behavior: 'smooth' // Adiciona uma animação suave
+    });
+}
+  empresas:any[]
+  fornecedores:SelectItem[]
+  selectedFornecedores!: SelectItem[];
+
+  getSelectFields(products:any[]){
+   this.empresas = Array.from(this.getValoresUnicosPorAtributo(products,'empresa'));
+   this.fornecedores = this.mapDropValuesSupplier(Array.from(this.getValoresUnicosPorAtributo(products,'fornecedor')));
+
+    console.log(this.empresas);
+    console.log(this.fornecedores);
+    
+  }
+  onFilterChange(value: any) {
+    console.log("Valor selecionado:", value);
+}
+
+   getValoresUnicosPorAtributo<T>(array: T[], atributo: keyof T) {
+    const valoresUnicos = new Set(); // Armazena valores únicos do atributo
+     array.filter((item) => {
+        const valorAtributo = item[atributo];
+        if (!valoresUnicos.has(valorAtributo)) {
+            valoresUnicos.add(item[atributo]);
+            return true;
+        }
+        return false;
+    });
+
+
+    return valoresUnicos
+}
+
+
+  mapDropValuesSupplier(vl:any){
+    return vl.map((i,index )=> 
+    {
+      return {
+        value:index,
+        name:i
+      }
+    }
+    )
+  }
+
+  mapDropValuesStore(vl:any){
+    return vl.map((i,index )=> 
+    {
+      return STORE_DATABASE_MAPPER_TO[i]
+    }
+    )
   }
 
   verifyProductStats(){
@@ -126,6 +185,9 @@ export class ProductsComponent implements OnInit {
     }
 
     productMapping(products:any[]){
+
+
+
       return products.map(
         (product:{produto:any}) => {
 
@@ -139,6 +201,7 @@ export class ProductsComponent implements OnInit {
               codigo_ean:product.produto.gtin,
               imagem:product.produto.anexos[0] ? product.produto.anexos[0].anexo : "Sem imagens para o produto" ,
               fornecedor:product.produto.nome_fornecedor,
+              empresa:STORE_DATABASE_MAPPER_TO[product.produto.empresa],
               classe:CLASSPRODUCT_DATABASE_MAPPER[product.produto.classe_produto],
               marketPlace:marketPlaceData.marketplace,
               comissao:marketPlaceData.comissao,
@@ -159,7 +222,7 @@ export class ProductsComponent implements OnInit {
   desserialize(prod:any[]){
     const flatedArray = prod.flat()
     this.products = flatedArray
-    console.log(flatedArray);
+    this.getSelectFields(this.products)
     
   }
       

@@ -1,11 +1,13 @@
 <div class="layout-wrapper surface-0 flex">
     <div id="home" class="overflow-hidden" >
         <span style="margin: 1rem; display: flex; flex-direction: column;">
-
-            <h3 class="p-3">
+            <span class="flex">
                 <i class="pi pi-dollar" style="transform: scale(1.8);"></i>
-                Gerenciador de preços
-            </h3>
+                <h3 class="p-3 font-bold" style="font-size: 2rem;"> 
+                    Gerenciador de preços
+                </h3>
+            </span>
+            
             <span class="buttons">
                 <p-button 
                 class="carregamento"
@@ -27,8 +29,9 @@
            
         </span>
         
-        <div id="userData" >
+        <div id="userData"  >
             <p-table
+            #scrollContainer
             [paginator]="true"
             [rows]="5"  
             sortMode="single" 
@@ -36,17 +39,21 @@
             scrollHeight="1000px" 
             rowGroupMode="subheader" 
             [value]="products" 
-            [rowsPerPageOptions]="[5,10,20,50,100]"
+            [rowsPerPageOptions]="[5,10,20,50]"
             groupRowsBy="nome" 
-            dataKey="id" [tableStyle]="{ 'min-width': '400vh' }">
+            dataKey="id" 
+            [tableStyle]="{ 'min-width': '240vw', 'height':'100vh'}">
                 <ng-template pTemplate="header">
                     <tr>
                         <th 
                         style="width:22rem">
-                            SKU  />
+                            SKU 
                         </th>
                         <th pSortableColumn="nome" style="width:22rem">
                             Descrição <p-sortIcon field="nome" />
+                        </th>
+                        <th style="width:22rem">
+                            Loja 
                         </th>
                         <th  style="width:22rem">
                             Código Ean
@@ -103,10 +110,42 @@
                             <p-columnFilter type="text" field="nome" [showClearButton]="true" matchMode="contains" [showMenu]="false" />
                         </th>
                         <th>
+                            <p-columnFilter field="empresa" matchMode="equals" [showMenu]="false">
+                                <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                                    <p-dropdown 
+                                        [ngModel]="value" 
+                                        [options]="empresas"
+                                        (onChange)="filter($event.value)"
+                                        [showClear]="true">
+                                            <ng-template let-option pTemplate="item">
+                                              {{option}}
+                                            </ng-template>
+                                    </p-dropdown>
+                                </ng-template>
+                            </p-columnFilter>
+                        </th>
+                        <th>
                             <p-columnFilter type="text" field="codigo_ean" [showClearButton]="true" matchMode="contains" [showMenu]="false" />
                         </th>
                         <th>
-                            <p-columnFilter type="text" field="fornecedor" [showClearButton]="true" matchMode="contains" [showMenu]="false" />
+                            <p-columnFilter field="fornecedor" matchMode="in" [showMenu]="false">
+                                <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                                    <p-multiSelect  
+                                        [ngModel]="value" 
+                                        [options]="fornecedores"
+                                        (onChange)="filter($event.value)"
+                                        [showClear]="true"
+                                        optionLabel="name"
+                                        optionValue="name">
+                                        <ng-template let-option pTemplate="item">
+                                                <span class="ml-1 mt-1">
+                                                    {{ option.name  }}
+                                                </span>
+                                        </ng-template>
+                                    </p-multiSelect>
+
+                                </ng-template>
+                            </p-columnFilter>
                         </th>
                         <th>
                             <p-columnFilter type="text" field="classe" [showClearButton]="true" matchMode="contains" [showMenu]="false" />
@@ -134,7 +173,8 @@
                                         [ngModel]="value" 
                                         [options]="price_statuslist"
                                         (onChange)="filter($event.value)"
-                                        [showClear]="true">
+                                        [showClear]="true"
+                                        >
                                             <ng-template let-option pTemplate="item">
                                               {{option}}
                                             </ng-template>
@@ -148,7 +188,7 @@
                 </ng-template>
                 <ng-template pTemplate="groupheader" let-product>
                     <tr pRowGroupHeader>
-                        <td colspan="14" style="vertical-align: middle;">
+                        <td colspan="15" style="vertical-align: middle;">
                             <span 
                             class="flex align-items-center">
                                 <p-image
@@ -157,7 +197,12 @@
                                 width="250" 
                                 [preview]="false"
                                 />
-                            <span  style="font-size: 1.5rem;vertical-align: middle;" class="font-bold ml-2">{{product.nome}}</span>
+                            <span  style="font-size: 1.5rem;vertical-align: middle;" class="font-bold ml-2">
+                                {{product.nome}}
+                                <p-tag 
+                            [severity]="price_status[product.status]?.severity" 
+                            [value]="price_status[product.status]?.label"></p-tag>
+                            </span>
                         
                             </span>
                             </td>
@@ -170,6 +215,9 @@
                         </td>
                         <td  >
                             {{ product.nome }}
+                        </td>
+                        <td  >
+                            {{ product.empresa }}
                         </td>
                         <td  >
                             {{ product.codigo_ean }}
@@ -191,11 +239,12 @@
                                 <ng-template pTemplate="input">
                                      <p-inputNumber 
                                         [(ngModel)]="product.preco_custo" 
-                                        inputId="currency-us" 
+                                        mode="decimal"  
+                                        [maxFractionDigits]="10"
                                         (keydown.enter)="onEdit($event)"/> 
                                 </ng-template>
                                 <ng-template pTemplate="output">
-                                    {{ product.preco_custo | currency }}
+                                    {{ product.preco_custo | currency:'BRL':true:'1.2-10' }}
                                 </ng-template>
                             </p-cellEditor>
                         </td>
@@ -205,11 +254,12 @@
                                 <ng-template pTemplate="input">
                                      <p-inputNumber 
                                         [(ngModel)]="product.preco_venda" 
-                                        inputId="currency-us"
+                                        mode="decimal"  
+                                        [maxFractionDigits]="10"
                                         (keydown.enter)="onEdit($event)"/> 
                                 </ng-template>
                                 <ng-template pTemplate="output">
-                                    {{ product.preco_venda | currency }}
+                                    {{ product.preco_venda | currency:'BRL':true:'1.2-10' }}
                                 </ng-template>
                             </p-cellEditor>
                         </td>
@@ -219,6 +269,8 @@
                                 <ng-template pTemplate="input">
                                     <p-inputNumber 
                                         [(ngModel)]="product.margem_contrib" 
+                                        mode="decimal"  
+                                        [maxFractionDigits]="10"
                                         (keydown.enter)="onEdit($event)"
                                        /> 
 
@@ -232,10 +284,14 @@
                         <td [pEditableColumn]="product.lucro_liquido" pEditableColumnField="lucro_liquido">
                             <p-cellEditor>
                                 <ng-template pTemplate="input">
-                                    <input pInputText [(ngModel)]="product.lucro_liquido" (keydown.enter)="onEdit($event)" />
+                                    <p-inputNumber 
+                                     [(ngModel)]="product.lucro_liquido"
+                                    mode="decimal"  
+                                    [maxFractionDigits]="10"
+                                     (keydown.enter)="onEdit($event)" />
                                 </ng-template>
                                 <ng-template pTemplate="output">
-                                    {{ product.lucro_liquido | currency }}
+                                    {{ product.lucro_liquido | currency:'BRL':true:'1.2-10' }}
                                 </ng-template>
                             </p-cellEditor>
                         </td>

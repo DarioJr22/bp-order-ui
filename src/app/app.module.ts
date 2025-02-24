@@ -1,5 +1,5 @@
-import { DEFAULT_CURRENCY_CODE, NgModule } from '@angular/core';
-import { CommonModule, DATE_PIPE_DEFAULT_OPTIONS, HashLocationStrategy, LocationStrategy, PathLocationStrategy } from '@angular/common';
+import { DEFAULT_CURRENCY_CODE, LOCALE_ID, NgModule } from '@angular/core';
+import { CommonModule, DATE_PIPE_DEFAULT_OPTIONS, HashLocationStrategy, LocationStrategy, PathLocationStrategy, registerLocaleData } from '@angular/common';
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
 import { AppLayoutModule } from './layout/app.layout.module';
@@ -13,6 +13,9 @@ import { NodeService } from './demo/service/node.service';
 import { PhotoService } from './demo/service/photo.service';
 import { NgcCookieConsentModule, NgcCookieConsentConfig } from 'ngx-cookieconsent';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import localePt from '@angular/common/locales/pt';
+
+registerLocaleData(localePt);
 
 const cookieConfig: NgcCookieConsentConfig = {
     cookie: {
@@ -48,6 +51,7 @@ const cookieConfig: NgcCookieConsentConfig = {
     providers: [
         { provide: LocationStrategy, useClass: PathLocationStrategy },
         {provide:DEFAULT_CURRENCY_CODE, useValue:'BRL'},
+        {provide: LOCALE_ID, useValue: 'pt' },
         {provide:DATE_PIPE_DEFAULT_OPTIONS, useValue:{dateFormat:'dd/MM/yyyy hh:mm:ss'}},
         CountryService, CustomerService, EventService, IconService, NodeService,
         PhotoService, ProductService

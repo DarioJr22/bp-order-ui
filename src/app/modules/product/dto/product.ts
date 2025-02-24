@@ -12,6 +12,7 @@ export interface Product{
     preco_venda:string,
     margem_contrib:string
     lucro_liquido:string,
+    empresa?:string,
     status:string,
     data_ultima_prec:Date
 }
