@@ -85,4 +85,37 @@ th{
     .p-button.carregamento{
         margin: 2rem;
     }
+    
+    // Estilos para o modal
+    .product-detail-container {
+        .product-header {
+            border-bottom: 1px solid #e9ecef;
+            padding-bottom: 1rem;
+            
+            .product-title {
+                color: #495057;
+                margin-bottom: 1rem;
+            }
+            
+            .product-details p {
+                margin-bottom: 0.5rem;
+                color: #6c757d;
+            }
+        }
+        
+        .pricing-section {
+            h3 {
+                color: #495057;
+                margin-bottom: 1rem;
+                border-bottom: 2px solid var(--primary-color);
+                padding-bottom: 0.5rem;
+            }
+        }
+    }
+    
+    // Hover effect para as linhas da tabela principal
+    .product-row:hover {
+        background-color: #f8f9fa !important;
+        cursor: pointer;
+    }
 }

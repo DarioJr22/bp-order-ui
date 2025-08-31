@@ -1,0 +1,329 @@
+<div class="layout-wrapper surface-0 flex">
+    <div id="home" class="overflow-hidden" >
+        <span style="margin: 1rem; display: flex; flex-direction: column;">
+            <span class="flex">
+                <i class="pi pi-dollar" style="transform: scale(1.8);"></i>
+                <h3 class="p-3 font-bold" style="font-size: 2rem;"> 
+                    Gerenciador de preços
+                </h3>
+            </span>
+            
+            <span class="buttons">
+                <p-button 
+                class="carregamento"
+                label="Forçar carregamento" 
+                icon="pi pi-check" 
+                (onClick)="load()" />
+    
+                <p-button  
+                pTooltip="EM BREVE (Exportar Excel)" 
+                severity="success"
+                icon="pi pi-file-excel"  />
+    
+                <p-button 
+                pTooltip="EM BREVE (Exportar PDF)" 
+                severity="danger"
+                icon="pi pi-file-pdf"  />
+    
+            </span>
+           
+        </span>
+        
+        <div id="userData"  >
+            <p-table
+            #scrollContainer
+            [paginator]="true"
+            [rows]="5"  
+            sortMode="single" 
+            [scrollable]="true"
+            scrollHeight="1000px" 
+            rowGroupMode="subheader" 
+            [value]="products" 
+            [rowsPerPageOptions]="[5,10,20,50]"
+            groupRowsBy="nome" 
+            dataKey="id" 
+            [tableStyle]="{ 'min-width': '240vw', 'height':'100vh'}">
+                <ng-template pTemplate="header">
+                    <tr>
+                        <th 
+                        style="width:22rem">
+                            SKU 
+                        </th>
+                        <th pSortableColumn="nome" style="width:22rem">
+                            Descrição <p-sortIcon field="nome" />
+                        </th>
+                        <th style="width:22rem">
+                            Loja 
+                        </th>
+                        <th  style="width:22rem">
+                            Código Ean
+                        </th>
+                        <th style="width:22rem">
+                            Fornecedor
+                        </th>
+                        <th  style="width:22rem">
+                            Classe Produto 
+                        </th>
+
+                        <th pSortableColumn="marketPlace" style="width:22rem">
+                            Market Place <p-sortIcon field="marketPlace" />
+                        </th>
+
+                        <th  style="width:12rem">
+                           Comissão <p-sortIcon  />
+                        </th>
+
+                        <th  style="width:12rem">
+                            Preço custo
+                         </th>
+
+                         <th  style="width:12rem">
+                            Preço venda 
+                         </th>
+
+                         <th  style="width:12rem">
+                            Margem
+                         </th>
+
+                         <th  style="width:12rem">
+                            Lucro Líquido 
+                         </th>
+                         <th  style="width:22rem">
+                            Ações 
+                         </th>
+
+                         <th  style="width:12rem">
+                            Status
+                         </th>
+
+                         <th  style="width:22rem">
+                            Data da  ultima precificação 
+                         </th>
+
+
+                    </tr>
+                    <tr>
+                        <th>
+                            <p-columnFilter type="text" field="sku" [showClearButton]="true" matchMode="contains" [showMenu]="false"/>
+                        </th>
+                        <th>
+                            <p-columnFilter type="text" field="nome" [showClearButton]="true" matchMode="contains" [showMenu]="false" />
+                        </th>
+                        <th>
+                            <p-columnFilter field="empresa" matchMode="equals" [showMenu]="false">
+                                <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                                    <p-dropdown 
+                                        [ngModel]="value" 
+                                        [options]="empresas"
+                                        (onChange)="filter($event.value)"
+                                        [showClear]="true">
+                                            <ng-template let-option pTemplate="item">
+                                              {{option}}
+                                            </ng-template>
+                                    </p-dropdown>
+                                </ng-template>
+                            </p-columnFilter>
+                        </th>
+                        <th>
+                            <p-columnFilter type="text" field="codigo_ean" [showClearButton]="true" matchMode="contains" [showMenu]="false" />
+                        </th>
+                        <th>
+                            <p-columnFilter field="fornecedor" matchMode="in" [showMenu]="false">
+                                <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                                    <p-multiSelect  
+                                        [ngModel]="value" 
+                                        [options]="fornecedores"
+                                        (onChange)="filter($event.value)"
+                                        [showClear]="true"
+                                        optionLabel="name"
+                                        optionValue="name">
+                                        <ng-template let-option pTemplate="item">
+                                                <span class="ml-1 mt-1">
+                                                    {{ option.name  }}
+                                                </span>
+                                        </ng-template>
+                                    </p-multiSelect>
+
+                                </ng-template>
+                            </p-columnFilter>
+                        </th>
+                        <th>
+                            <p-columnFilter type="text" field="classe" [showClearButton]="true" matchMode="contains" [showMenu]="false" />
+                        </th>
+                        <th>
+                            <p-columnFilter type="text" field="marketPlace" [showClearButton]="true" matchMode="contains" [showMenu]="false" />
+                        </th>
+                        <th>
+                          
+                        </th>
+                        <th>
+                        </th>
+                        <th>
+                        </th>
+                        <th>
+                        </th>
+                        <th>
+                        </th>
+                        <th>
+                        </th>
+                        <th>
+                            <p-columnFilter field="status" matchMode="equals" [showMenu]="false">
+                                <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                                    <p-dropdown 
+                                        [ngModel]="value" 
+                                        [options]="price_statuslist"
+                                        (onChange)="filter($event.value)"
+                                        [showClear]="true"
+                                        >
+                                            <ng-template let-option pTemplate="item">
+                                              {{option}}
+                                            </ng-template>
+                                    </p-dropdown>
+                                </ng-template>
+                            </p-columnFilter>
+                        </th>
+                        <th>
+                        </th>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="groupheader" let-product>
+                    <tr pRowGroupHeader>
+                        <td colspan="15" style="vertical-align: middle;">
+                            <span 
+                            class="flex align-items-center">
+                                <p-image
+                                [alt]="product.nome" 
+                                [src]="product.imagem" 
+                                width="250" 
+                                [preview]="false"
+                                />
+                            <span  style="font-size: 1.5rem;vertical-align: middle;" class="font-bold ml-2">
+                                {{product.nome}}
+                                <p-tag 
+                            [severity]="price_status[product.status]?.severity" 
+                            [value]="price_status[product.status]?.label"></p-tag>
+                            </span>
+                        
+                            </span>
+                            </td>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-product let-editing="editing">
+                    <tr>
+                        <td  >
+                            {{ product.sku }}
+                        </td>
+                        <td  >
+                            {{ product.nome }}
+                        </td>
+                        <td  >
+                            {{ product.empresa }}
+                        </td>
+                        <td  >
+                            {{ product.codigo_ean }}
+                        </td>
+                        <td  >
+                            {{ product.fornecedor }}
+                        </td>
+                        <td>
+                            {{ product.classe }}
+                        </td>
+                        <td>
+                            {{ product.marketPlace }}
+                        </td>
+                        <td>
+                            {{ product.comissao }}
+                        </td>
+                        <td [pEditableColumn]="product.preco_custo" pEditableColumnField="preco_custo">
+                            <p-cellEditor>
+                                <ng-template pTemplate="input">
+                                     <p-inputNumber 
+                                        [(ngModel)]="product.preco_custo" 
+                                        mode="decimal"  
+                                        [maxFractionDigits]="10"
+                                        (keydown.enter)="onEdit($event)"/> 
+                                </ng-template>
+                                <ng-template pTemplate="output">
+                                    {{ product.preco_custo | currency:'BRL':true:'1.2-10' }}
+                                </ng-template>
+                            </p-cellEditor>
+                        </td>
+                      
+                        <td [pEditableColumn]="product.preco_venda" pEditableColumnField="preco_venda">
+                            <p-cellEditor>
+                                <ng-template pTemplate="input">
+                                     <p-inputNumber 
+                                        [(ngModel)]="product.preco_venda" 
+                                        mode="decimal"  
+                                        [maxFractionDigits]="10"
+                                        (keydown.enter)="onEdit($event)"/> 
+                                </ng-template>
+                                <ng-template pTemplate="output">
+                                    {{ product.preco_venda | currency:'BRL':true:'1.2-10' }}
+                                </ng-template>
+                            </p-cellEditor>
+                        </td>
+                      
+                        <td [pEditableColumn]="product.margem_contrib" pEditableColumnField="margem_contrib">
+                            <p-cellEditor>
+                                <ng-template pTemplate="input">
+                                    <p-inputNumber 
+                                        [(ngModel)]="product.margem_contrib" 
+                                        mode="decimal"  
+                                        [maxFractionDigits]="10"
+                                        (keydown.enter)="onEdit($event)"
+                                       /> 
+
+                                </ng-template>
+                                <ng-template pTemplate="output">
+                                    {{ product.margem_contrib + '%'}}
+                                </ng-template>
+                            </p-cellEditor>
+                        </td>
+                      
+                        <td [pEditableColumn]="product.lucro_liquido" pEditableColumnField="lucro_liquido">
+                            <p-cellEditor>
+                                <ng-template pTemplate="input">
+                                    <p-inputNumber 
+                                     [(ngModel)]="product.lucro_liquido"
+                                    mode="decimal"  
+                                    [maxFractionDigits]="10"
+                                     (keydown.enter)="onEdit($event)" />
+                                </ng-template>
+                                <ng-template pTemplate="output">
+                                    {{ product.lucro_liquido | currency:'BRL':true:'1.2-10' }}
+                                </ng-template>
+                            </p-cellEditor>
+                        </td>
+
+                        <td >
+                            <p-button 
+                            label="Atualizar produto" 
+                            severity="success"
+                            icon="pi pi-edit" 
+                            (onClick)="updateProduct(product)" />
+                        </td>
+                      
+                      
+                        <td>
+                            <p-tag 
+                            [severity]="price_status[product.status]?.severity" 
+                            [value]="price_status[product.status]?.label"></p-tag>
+                        </td>
+                      
+                      
+                        <td>
+                            {{ product.data_ultima_prec | date}}
+                        </td>
+                      
+                    </tr>
+                </ng-template>
+            </p-table>
+        
+            
+        </div>
+
+    
+    </div>
+</div>
+<p-toast key="tst"></p-toast>

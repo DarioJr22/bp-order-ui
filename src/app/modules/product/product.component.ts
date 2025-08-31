@@ -20,25 +20,24 @@ import { BehaviorSubject, switchMap } from 'rxjs';
 })
 export class ProductsComponent implements OnInit {
 
-   /* 
-  - [x] Fazer paginação no front OK
-  - [x] Fazer paginação no back OK
-  - [x] Fazer filtragem no front / Back OK
-  - [X] Fazer desserialização de produtos
-  - [ ] Fazer edição front 
-  - [ ] back
-  - [ ] Implementar um bom design 
-   
-   */
+
     price_statuslist = [
       'precificado',
       'atencao',
       'urgente'
     ]
     products: Product[] =  [];
+    groupedProducts: Product[] = []; // Nova propriedade para produtos agrupados
     products$:BehaviorSubject<Product[]> = new BehaviorSubject([])
     @ViewChild('scrollContainer') scrollContainer!: ElementRef; 
     price_status = PRICE_STATUS
+    
+    // Propriedades do Modal
+    displayProductModal: boolean = false;
+    selectedProduct: Product | null = null;
+    productMarketplaces: any[] = [];
+    editingRows: { [key: number]: boolean } = {};
+    
     pageUser = {
       page:1,
       limit:3
@@ -157,6 +156,7 @@ export class ProductsComponent implements OnInit {
     }
 
     updateProduct(newProduct:Product){
+      console.log(newProduct);
       this.productService.getProductById(newProduct.id).pipe(switchMap(
         (oldProduct:any)=>{
           let productPricing = oldProduct[0].preco_marketplace
@@ -182,6 +182,17 @@ export class ProductsComponent implements OnInit {
             this.showErrorViaToast(`Erro ao atualizar Produto ${ newProduct.nome} !`)
           }
       })
+    }
+
+
+    addMarketPlace(product: Product) {
+      // Lógica para adicionar um novo marketplace ao produto
+      console.log("Adicionando novo marketplace para o produto:", product);
+    }
+
+     deleteMarketPlace(product: Product) {
+      // Lógica para adicionar um novo marketplace ao produto
+      console.log("Adicionando novo marketplace para o produto:", product);
     }
 
     productMapping(products:any[]){
@@ -224,6 +235,69 @@ export class ProductsComponent implements OnInit {
     this.products = flatedArray
     this.getSelectFields(this.products)
     
+    // Agrupar produtos por SKU (um produto por linha na tabela principal)
+    this.groupProductsBySku();
+  }
+
+  groupProductsBySku() {
+    const grouped = new Map<string, Product>();
+    
+    this.products.forEach(product => {
+      if (!grouped.has(product.sku)) {
+        grouped.set(product.sku, { ...product });
+      }
+    });
+    
+    this.groupedProducts = Array.from(grouped.values());
+  }
+
+  openProductModal(product: Product) {
+    this.selectedProduct = { ...product };
+    this.displayProductModal = true;
+    
+    // Buscar todos os marketplaces para este produto
+    this.productMarketplaces = this.products
+      .filter(p => p.sku === product.sku)
+      .map(p => ({
+        marketPlace: p.marketPlace,
+        comissao: p.comissao,
+        preco_custo: parseFloat(p.preco_custo.toString()),
+        preco_venda: parseFloat(p.preco_venda.toString()),
+        margem_contrib: parseFloat(p.margem_contrib.toString()),
+        lucro_liquido: parseFloat(p.lucro_liquido.toString()),
+        status: p.status,
+        data_ultima_prec: p.data_ultima_prec
+      }));
+  }
+
+  onRowEditInit(marketplace: any, index: number) {
+    this.editingRows[index] = true;
+  }
+
+  onRowEditSave(marketplace: any, index: number) {
+    // Encontrar o produto correspondente na lista principal
+    const productToUpdate = this.products.find(p => 
+      p.sku === this.selectedProduct!.sku && 
+      p.marketPlace === marketplace.marketPlace
+    );
+    
+    if (productToUpdate) {
+      // Atualizar os valores
+      productToUpdate.preco_custo = marketplace.preco_custo.toString();
+      productToUpdate.preco_venda = marketplace.preco_venda.toString();
+      productToUpdate.margem_contrib = marketplace.margem_contrib.toString();
+      productToUpdate.lucro_liquido = marketplace.lucro_liquido.toString();
+      
+      // Chamar o método de atualização existente
+      this.updateProduct(productToUpdate);
+    }
+    
+    delete this.editingRows[index];
+  }
+
+  onRowEditCancel(marketplace: any, index: number) {
+    // Restaurar valores originais se necessário
+    delete this.editingRows[index];
   }
       
   showInfoViaToast(message: string) {

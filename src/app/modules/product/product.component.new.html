@@ -1,4 +1,4 @@
-
+<div class="layout-wrapper surface-0 flex"></div>
     <div id="home" class="overflow-hidden" >
         <span style="margin: 1rem; display: flex; flex-direction: column;">
             <span class="flex">
@@ -172,17 +172,7 @@
 
                 <!-- Tabela de Precificação -->
                 <div class="pricing-section">
-                    <span>
-                        <h3>Precificação por Marketplace</h3>
-                        <p-button 
-                            icon="pi pi-plus-circle" 
-                            size="small"
-                            severity="success"
-                            pTooltip="Adicionar Marketplace"
-                            (onClick)="addMarketPlace(selectedProduct)">
-                        </p-button>
-                    </span>
-                    
+                    <h3>Precificação por Marketplace</h3>
                     <p-table 
                         [value]="productMarketplaces" 
                         [scrollable]="true"
@@ -203,91 +193,101 @@
                             </tr>
                         </ng-template>
                         
-                        <ng-template pTemplate="body" let-marketPlace let-editing="editing" let-ri="rowIndex">
-                            <tr>
-                                <td>{{ marketPlace.marketPlace }}</td>
-                                <td>{{ marketPlace.comissao }}</td>
-                                <td [pEditableColumn]="marketPlace.preco_custo" pEditableColumnField="preco_custo">
+                        <ng-template pTemplate="body" let-marketplace let-editing="editing" let-ri="rowIndex">
+                            <tr [pEditableRow]="marketplace">
+                                <td>{{ marketplace.marketPlace }}</td>
+                                <td>{{ marketplace.comissao }}</td>
+                                <td>
                                     <p-cellEditor>
                                         <ng-template pTemplate="input">
                                             <p-inputNumber 
-                                                [(ngModel)]="marketPlace.preco_custo" 
+                                                [(ngModel)]="marketplace.preco_custo" 
                                                 mode="currency" 
                                                 currency="BRL"
                                                 [style]="{'width':'100%'}">
                                             </p-inputNumber>
                                         </ng-template>
                                         <ng-template pTemplate="output">
-                                            {{ marketPlace.preco_custo | currency:'BRL' }}
+                                            {{ marketplace.preco_custo | currency:'BRL' }}
                                         </ng-template>
                                     </p-cellEditor>
                                 </td>
-                                <td [pEditableColumn]="marketPlace.preco_venda" pEditableColumnField="preco_venda">
+                                <td>
                                     <p-cellEditor>
                                         <ng-template pTemplate="input">
                                             <p-inputNumber 
-                                                [(ngModel)]="marketPlace.preco_venda" 
+                                                [(ngModel)]="marketplace.preco_venda" 
                                                 mode="currency" 
                                                 currency="BRL"
                                                 [style]="{'width':'100%'}">
                                             </p-inputNumber>
                                         </ng-template>
                                         <ng-template pTemplate="output">
-                                            {{ marketPlace.preco_venda | currency:'BRL' }}
+                                            {{ marketplace.preco_venda | currency:'BRL' }}
                                         </ng-template>
                                     </p-cellEditor>
                                 </td>
-                                <td [pEditableColumn]="marketPlace.margem_contrib" pEditableColumnField="margem_contrib">
+                                <td>
                                     <p-cellEditor>
                                         <ng-template pTemplate="input">
                                             <p-inputNumber 
-                                                [(ngModel)]="marketPlace.margem_contrib" 
+                                                [(ngModel)]="marketplace.margem_contrib" 
                                                 suffix="%" 
                                                 [style]="{'width':'100%'}">
                                             </p-inputNumber>
                                         </ng-template>
                                         <ng-template pTemplate="output">
-                                            {{ marketPlace.margem_contrib }}%
+                                            {{ marketplace.margem_contrib }}%
                                         </ng-template>
                                     </p-cellEditor>
                                 </td>
-                                <td [pEditableColumn]="marketPlace.lucro_liquido" pEditableColumnField="lucro_liquido">
+                                <td>
                                     <p-cellEditor>
                                         <ng-template pTemplate="input">
                                             <p-inputNumber 
-                                                [(ngModel)]="marketPlace.lucro_liquido" 
+                                                [(ngModel)]="marketplace.lucro_liquido" 
                                                 mode="currency" 
                                                 currency="BRL"
                                                 [style]="{'width':'100%'}">
                                             </p-inputNumber>
                                         </ng-template>
                                         <ng-template pTemplate="output">
-                                            {{ marketPlace.lucro_liquido | currency:'BRL' }}
+                                            {{ marketplace.lucro_liquido | currency:'BRL' }}
                                         </ng-template>
                                     </p-cellEditor>
                                 </td>
                                 <td>
                                     <p-tag 
-                                        [severity]="price_status[marketPlace.status]?.severity" 
-                                        [value]="price_status[marketPlace.status]?.label">
+                                        [severity]="price_status[marketplace.status]?.severity" 
+                                        [value]="price_status[marketplace.status]?.label">
                                     </p-tag>
                                 </td>
-                                <td>{{ marketPlace.data_ultima_prec | date:'dd/MM/yyyy HH:mm' }}</td>
+                                <td>{{ marketplace.data_ultima_prec | date:'dd/MM/yyyy HH:mm' }}</td>
                                 <td>
                                     <div class="flex gap-2">
-                                         <p-button 
-                                            icon="pi pi-trash" 
-                                            size="small"
-                                            severity="danger"
-                                            pTooltip="Editar"
-                                            (onClick)="deleteMarketPlace(selectedProduct)">
-                                        </p-button>
                                         <p-button 
+                                            *ngIf="!editing"
                                             icon="pi pi-pencil" 
                                             size="small"
-                                            severity="warn"
+                                            severity="success"
                                             pTooltip="Editar"
-                                            (onClick)="updateProduct(selectedProduct)">
+                                            (onClick)="onRowEditInit(marketplace, ri)">
+                                        </p-button>
+                                        <p-button 
+                                            *ngIf="editing"
+                                            icon="pi pi-check" 
+                                            size="small"
+                                            severity="success"
+                                            pTooltip="Salvar"
+                                            (onClick)="onRowEditSave(marketplace, ri)">
+                                        </p-button>
+                                        <p-button 
+                                            *ngIf="editing"
+                                            icon="pi pi-times" 
+                                            size="small"
+                                            severity="danger"
+                                            pTooltip="Cancelar"
+                                            (onClick)="onRowEditCancel(marketplace, ri)">
                                         </p-button>
                                     </div>
                                 </td>
@@ -298,4 +298,5 @@
             </div>
         </p-dialog>
     </div>
+</div>
 <p-toast key="tst"></p-toast>
