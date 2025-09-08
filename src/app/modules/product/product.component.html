@@ -44,17 +44,35 @@
                 
                 <ng-template pTemplate="header">
                     <tr>
-                        <th style="width:15%">SKU</th>
+                        <th style="width:8%">Imagem</th>
+                        <th style="width:10%">Status</th>
+                        <th style="width:13%">SKU</th>
                         <th pSortableColumn="nome" style="width:25%">
                             Descrição <p-sortIcon field="nome" />
                         </th>
-                        <th style="width:15%">Loja</th>
-                        <th style="width:15%">Código EAN</th>
-                        <th style="width:15%">Fornecedor</th>
-                        <th style="width:10%">Classe</th>
+                        <th style="width:13%">Loja</th>
+                        <th style="width:12%">Código EAN</th>
+                        <th style="width:10%">Fornecedor</th>
+                        <th style="width:7%">Classe</th>
                         <th style="width:5%">Ações</th>
                     </tr>
                     <tr>
+                        <th></th>
+                        <th>
+                            <p-columnFilter field="status" matchMode="equals" [showMenu]="false">
+                                <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                                    <p-dropdown 
+                                        [ngModel]="value" 
+                                        [options]="price_statuslist"
+                                        (onChange)="filter($event.value)"
+                                        [showClear]="true">
+                                        <ng-template let-option pTemplate="item">
+                                            {{option}}
+                                        </ng-template>
+                                    </p-dropdown>
+                                </ng-template>
+                            </p-columnFilter>
+                        </th>
                         <th>
                             <p-columnFilter type="text" field="sku" [showClearButton]="true" matchMode="contains" [showMenu]="false"/>
                         </th>
@@ -107,6 +125,18 @@
                 
                 <ng-template pTemplate="body" let-product>
                     <tr class="product-row" (click)="openProductModal(product)" style="cursor: pointer;">
+                        <td class="text-center">
+                            <img [src]="product.imagem" [alt]="product.nome" 
+                                 width="50" height="50" 
+                                 style="object-fit: cover; border-radius: 4px;"
+                                 onerror="this.src='assets/demo/images/product/placeholder.png'" />
+                        </td>
+                        <td>
+                            <p-tag 
+                                [severity]="price_status[product.status]?.severity" 
+                                [value]="price_status[product.status]?.label">
+                            </p-tag>
+                        </td>
                         <td>{{ product.sku }}</td>
                         <td>{{ product.nome }}</td>
                         <td>{{ product.empresa }}</td>
@@ -114,14 +144,7 @@
                         <td>{{ product.fornecedor }}</td>
                         <td>{{ product.classe }}</td>
                         <td>
-                            <p-button 
-                                icon="pi pi-eye" 
-                                [rounded]="true" 
-                                severity="info" 
-                                size="small"
-                                pTooltip="Ver detalhes"
-                                (onClick)="openProductModal(product); $event.stopPropagation()">
-                            </p-button>
+                            <p-button icon="pi pi-search" (onClick)="openProductModal(product); $event.stopPropagation()" [rounded]="true" [text]="true" severity="success" />
                         </td>
                     </tr>
                 </ng-template>
@@ -172,16 +195,16 @@
 
                 <!-- Tabela de Precificação -->
                 <div class="pricing-section">
-                    <span>
-                        <h3>Precificação por Marketplace</h3>
+                    <div class="flex justify-content-between align-items-center mb-3">
+                        <h3 class="m-0">Precificação por Marketplace</h3>
                         <p-button 
                             icon="pi pi-plus-circle" 
+                            label="Adicionar Marketplace"
                             size="small"
                             severity="success"
-                            pTooltip="Adicionar Marketplace"
                             (onClick)="addMarketPlace(selectedProduct)">
                         </p-button>
-                    </span>
+                    </div>
                     
                     <p-table 
                         [value]="productMarketplaces" 
@@ -204,7 +227,7 @@
                         </ng-template>
                         
                         <ng-template pTemplate="body" let-marketPlace let-editing="editing" let-ri="rowIndex">
-                            <tr>
+                            <tr [ngClass]="{'new-marketplace': marketPlace.isNew}">
                                 <td>{{ marketPlace.marketPlace }}</td>
                                 <td>{{ marketPlace.comissao }}</td>
                                 <td [pEditableColumn]="marketPlace.preco_custo" pEditableColumnField="preco_custo">
@@ -212,13 +235,14 @@
                                         <ng-template pTemplate="input">
                                             <p-inputNumber 
                                                 [(ngModel)]="marketPlace.preco_custo" 
-                                                mode="currency" 
+                                                mode="decimal" 
                                                 currency="BRL"
-                                                [style]="{'width':'100%'}">
+                                                [style]="{'width':'100%'}"
+                                                (keydown.enter)="onEdit($event)">
                                             </p-inputNumber>
                                         </ng-template>
                                         <ng-template pTemplate="output">
-                                            {{ marketPlace.preco_custo | currency:'BRL' }}
+                                            {{ marketPlace.preco_custo | currency:'BRL':true:'1.2-10' }}
                                         </ng-template>
                                     </p-cellEditor>
                                 </td>
@@ -227,13 +251,14 @@
                                         <ng-template pTemplate="input">
                                             <p-inputNumber 
                                                 [(ngModel)]="marketPlace.preco_venda" 
-                                                mode="currency" 
-                                                currency="BRL"
-                                                [style]="{'width':'100%'}">
+                                                mode="decimal" 
+                                                [maxFractionDigits]="10"
+                                                [style]="{'width':'100%'}"
+                                                (keydown.enter)="onEdit($event)">
                                             </p-inputNumber>
                                         </ng-template>
                                         <ng-template pTemplate="output">
-                                            {{ marketPlace.preco_venda | currency:'BRL' }}
+                                            {{ marketPlace.preco_venda |  currency:'BRL':true:'1.2-10' }}
                                         </ng-template>
                                     </p-cellEditor>
                                 </td>
@@ -242,8 +267,10 @@
                                         <ng-template pTemplate="input">
                                             <p-inputNumber 
                                                 [(ngModel)]="marketPlace.margem_contrib" 
-                                                suffix="%" 
-                                                [style]="{'width':'100%'}">
+                                                mode="decimal"  
+                                                [maxFractionDigits]="10"
+                                                [style]="{'width':'100%'}"
+                                                (keydown.enter)="onEdit($event)">
                                             </p-inputNumber>
                                         </ng-template>
                                         <ng-template pTemplate="output">
@@ -256,13 +283,13 @@
                                         <ng-template pTemplate="input">
                                             <p-inputNumber 
                                                 [(ngModel)]="marketPlace.lucro_liquido" 
-                                                mode="currency" 
-                                                currency="BRL"
+                                                mode="decimal"  
+                                                [maxFractionDigits]="10"
                                                 [style]="{'width':'100%'}">
                                             </p-inputNumber>
                                         </ng-template>
                                         <ng-template pTemplate="output">
-                                            {{ marketPlace.lucro_liquido | currency:'BRL' }}
+                                            {{ marketPlace.lucro_liquido |  currency:'BRL':true:'1.2-10' }}
                                         </ng-template>
                                     </p-cellEditor>
                                 </td>
@@ -275,19 +302,49 @@
                                 <td>{{ marketPlace.data_ultima_prec | date:'dd/MM/yyyy HH:mm' }}</td>
                                 <td>
                                     <div class="flex gap-2">
-                                         <p-button 
+                                        <!-- Botão para salvar novo marketplace -->
+                                        <p-button *ngIf="marketPlace.isNew"
+                                            icon="pi pi-save" 
+                                            size="small"
+                                            severity="success"
+                                            pTooltip="Salvar novo marketplace"
+                                            (onClick)="saveNewMarketplace(marketPlace)">
+                                        </p-button>
+                                        
+                                        <!-- Botão para excluir marketplace -->
+                                        <p-button 
                                             icon="pi pi-trash" 
                                             size="small"
                                             severity="danger"
-                                            pTooltip="Editar"
-                                            (onClick)="deleteMarketPlace(selectedProduct)">
+                                            pTooltip="Excluir marketplace"
+                                            (onClick)="deleteMarketPlace(marketPlace)">
                                         </p-button>
-                                        <p-button 
+                                        
+                                        <!-- Botão para atualizar marketplace existente -->
+                                        <p-button *ngIf="!marketPlace.isNew"
                                             icon="pi pi-pencil" 
                                             size="small"
                                             severity="warn"
-                                            pTooltip="Editar"
+                                            pTooltip="Atualizar marketplace"
                                             (onClick)="updateProduct(selectedProduct)">
+                                        </p-button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </ng-template>
+                        
+                        <!-- Template para quando não há dados -->
+                        <ng-template pTemplate="emptymessage">
+                            <tr>
+                                <td colspan="9" class="text-center p-4">
+                                    <div class="flex flex-column align-items-center">
+                                        <i class="pi pi-shopping-cart text-6xl text-primary mb-3"></i>
+                                        <span>Nenhum marketplace configurado para este produto</span>
+                                        <p-button 
+                                            label="Adicionar marketplace" 
+                                            icon="pi pi-plus"
+                                            styleClass="p-button-outlined mt-3"
+                                            (onClick)="addMarketPlace(selectedProduct)">
                                         </p-button>
                                     </div>
                                 </td>
@@ -298,4 +355,111 @@
             </div>
         </p-dialog>
     </div>
+
+<p-dialog 
+    [(visible)]="displayAddMarketplaceDialog" 
+    [modal]="true"
+    [draggable]="false"
+    [resizable]="false"
+    [style]="{width: '800px'}"
+    header="Adicionar Novo Marketplace">
+    
+    <div class="grid p-fluid">
+        <div class="col-6 field">
+            <label for="marketplace">Marketplace*</label>
+            <p-dropdown 
+                id="marketplace"
+                [options]="filteredMarketplaces" 
+                [(ngModel)]="newMarketplace.marketPlace"
+                placeholder="Selecione um marketplace"
+                [filter]="true"
+                filterBy="value"
+                [showClear]="true"
+                appendTo="body"
+                styleClass="w-full">
+            </p-dropdown>
+        </div>
+        
+        <div class="col-6 field">
+            <label for="comissao">Comissão (%)*</label>
+            <div class="p-inputgroup">
+                <input 
+                    id="comissao"
+                    type="text" 
+                    pInputText 
+                    [(ngModel)]="newMarketplace.comissao" 
+                    placeholder="Ex: 12%">
+            </div>
+        </div>
+        
+        <div class="col-6 field">
+            <label for="precoCusto">Preço de Custo (R$)*</label>
+            <p-inputNumber 
+                id="precoCusto"
+                [(ngModel)]="newMarketplace.preco_custo" 
+                mode="currency" 
+                currency="BRL"
+                locale="pt-BR"
+                [minFractionDigits]="2">
+            </p-inputNumber>
+        </div>
+        
+        <div class="col-6 field">
+            <label for="precoVenda">Preço de Venda (R$)*</label>
+            <p-inputNumber 
+                id="precoVenda"
+                [(ngModel)]="newMarketplace.preco_venda" 
+                mode="currency" 
+                currency="BRL"
+                locale="pt-BR"
+                (onBlur)="calculate(newMarketplace, 'MARGIN'); calculate(newMarketplace, 'PROFIT')"
+                (keydown.enter)="calculate(newMarketplace, 'MARGIN'); calculate(newMarketplace, 'PROFIT')"
+                (keydown.tab)="calculate(newMarketplace, 'MARGIN'); calculate(newMarketplace, 'PROFIT')"
+                [minFractionDigits]="2">
+            </p-inputNumber>
+        </div>
+        
+        <div class="col-6 field">
+            <label for="margem">Margem de Contribuição (%)*</label>
+            <div class="p-inputgroup">
+                <p-inputNumber 
+                    id="margem"
+                    [(ngModel)]="newMarketplace.margem_contrib" 
+                    suffix="%"
+                    [minFractionDigits]="2">
+                </p-inputNumber>
+            </div>
+        </div>
+        
+        <div class="col-6 field">
+            <label for="lucro">Lucro Líquido (R$)*</label>
+            <p-inputNumber 
+                id="lucro"
+                [(ngModel)]="newMarketplace.lucro_liquido" 
+                mode="currency" 
+                currency="BRL"
+                locale="pt-BR"
+                [minFractionDigits]="2">
+            </p-inputNumber>
+        </div>
+    </div>
+    
+    <ng-template pTemplate="footer">
+        <p-button 
+            icon="pi pi-times" 
+            label="Cancelar" 
+            severity="success"
+            (onClick)="displayAddMarketplaceDialog=false" 
+            styleClass="p-button-text">
+        </p-button>
+        <p-button 
+            icon="pi pi-plus" 
+            label="Adicionar" 
+            severity="success"
+            (onClick)="addNewMarketplaceToList()" 
+            [disabled]="!newMarketplace.marketPlace">
+        </p-button>
+    </ng-template>
+</p-dialog>
+
 <p-toast key="tst"></p-toast>

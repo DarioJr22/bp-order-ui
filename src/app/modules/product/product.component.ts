@@ -3,11 +3,11 @@ import { NgForm } from '@angular/forms';
 import { LayoutService } from 'src/app/layout/service/app.layout.service';
 import { Router } from '@angular/router';
 import { MessageService, SelectItem } from 'primeng/api';
-import { ProductService } from './product.service';
+import { CalculateStrategy, ProductService } from './product.service';
 import { SimplePage } from '../auth/detail-user/paged-user';
 import { AuthService, User } from '../auth/auth.service';
 import { ProductTinyApi } from '../orders/dto/product';
-import { Product } from './dto/product';
+import { MarketPlacePricing, Product } from './dto/product';
 import { ProductSearchReturn } from '../orders/dto/returnProduct';
 import { CLASSPRODUCT_DATABASE_MAPPER, PRICE_STATUS, ProducPricing, ProdutoStatus, Role, STORE_DATABASE_MAPPER_TO } from 'src/app/services/constants';
 import { BehaviorSubject, switchMap } from 'rxjs';
@@ -37,6 +37,25 @@ export class ProductsComponent implements OnInit {
     selectedProduct: Product | null = null;
     productMarketplaces: any[] = [];
     editingRows: { [key: number]: boolean } = {};
+    
+    // Propriedades para adição de marketplace
+    displayAddMarketplaceDialog: boolean = false;
+    newMarketplace: any = {
+      marketPlace: '',
+      comissao: '',
+      preco_custo: '',
+      preco_venda: '',
+      margem_contrib: '',
+      lucro_liquido: '',
+      status: 'precificado',
+      data_ultima_prec: new Date(),
+      isNew: true // Flag para identificar que é um novo marketplace
+    };
+
+
+  
+    availableMarketplaces: string[] = ['Mercado Livre Clássico', 'Mercado Livre Premium', 'Shopee', 'Amazon', 'Magazine Luiza'];
+    filteredMarketplaces: string[] = [];
     
     pageUser = {
       page:1,
@@ -157,6 +176,9 @@ export class ProductsComponent implements OnInit {
 
     updateProduct(newProduct:Product){
       console.log(newProduct);
+      console.log(this.productMarketplaces);
+
+      newProduct.marketPlace = this.productMarketplaces
       this.productService.getProductById(newProduct.id).pipe(switchMap(
         (oldProduct:any)=>{
           let productPricing = oldProduct[0].preco_marketplace
@@ -186,13 +208,133 @@ export class ProductsComponent implements OnInit {
 
 
     addMarketPlace(product: Product) {
-      // Lógica para adicionar um novo marketplace ao produto
-      console.log("Adicionando novo marketplace para o produto:", product);
+      // Abre o diálogo de adição de marketplace
+      this.resetNewMarketplace();
+      this.filterAvailableMarketplaces();
+      this.displayAddMarketplaceDialog = true;
     }
 
-     deleteMarketPlace(product: Product) {
-      // Lógica para adicionar um novo marketplace ao produto
-      console.log("Adicionando novo marketplace para o produto:", product);
+    // Filtrar marketplaces que ainda não foram adicionados
+    filterAvailableMarketplaces() {
+      const currentMarketplaces = this.productMarketplaces.map(mp => mp.marketPlace);
+      this.filteredMarketplaces = this.availableMarketplaces.filter(
+        mp => !currentMarketplaces.includes(mp)
+      );
+    }
+
+    // Resetar o novo marketplace
+    resetNewMarketplace() {
+      this.newMarketplace = {
+        marketPlace: '',
+        comissao: '',
+        preco_custo: 0,
+        preco_venda: 0,
+        margem_contrib: 0,
+        lucro_liquido: 0,
+        status: 'precificado',
+        data_ultima_prec: new Date(),
+        isNew: true
+      };
+    }
+
+    // Adicionar o novo marketplace à lista local
+    addNewMarketplaceToList() {
+      if (!this.newMarketplace.marketPlace) {
+        this.showWarnViaToast("Selecione um marketplace!");
+        return;
+      }
+
+      // Adicionar à lista local
+      this.productMarketplaces.push({...this.newMarketplace});
+      
+      // Fechar o diálogo
+      this.displayAddMarketplaceDialog = false;
+    }
+
+    // Salvar o novo marketplace no backend
+    saveNewMarketplace(marketplace: any) {
+      if (!this.selectedProduct) return;
+      
+      // Converter para o formato esperado pela API
+      const pricingData: ProducPricing = {
+        marketplace: marketplace.marketPlace,
+        comissao: marketplace.comissao,
+        preco_custo: marketplace.preco_custo.toString(),
+        preco_venda: marketplace.preco_venda.toString(),
+        margem_contribuicao: marketplace.margem_contrib.toString(),
+        lucro_liquido: marketplace.lucro_liquido.toString(),
+        data_precificacao: new Date(),
+        status: ProdutoStatus.PRECIFICADO
+      };
+      
+      this.productService.addMarketplacePricing(this.selectedProduct.sku, pricingData)
+        .subscribe({
+          next: (response: any) => {
+            // Remover a flag isNew
+            marketplace.isNew = false;
+            this.showSucsessViaToast(`Marketplace ${marketplace.marketPlace} adicionado com sucesso!`);
+            
+            // Atualizar a lista principal de produtos
+            this.refreshProductAfterMarketplaceChange();
+          },
+          error: (error) => {
+            this.showErrorViaToast(`Erro ao adicionar marketplace: ${error.message || 'Erro desconhecido'}`);
+          }
+        });
+    }
+
+    deleteMarketPlace(marketplace: any) {
+      if (!this.selectedProduct) return;
+      
+      // Confirmar antes de excluir
+      if (!confirm(`Tem certeza que deseja remover o marketplace ${marketplace.marketPlace}?`)) {
+        return;
+      }
+      
+      this.productService.deleteMarketplacePricing(this.selectedProduct.sku, marketplace.marketPlace)
+        .subscribe({
+          next: (response: any) => {
+            // Remover da lista local
+            this.productMarketplaces = this.productMarketplaces.filter(
+              mp => mp.marketPlace !== marketplace.marketPlace
+            );
+            
+            this.showSucsessViaToast(`Marketplace ${marketplace.marketPlace} removido com sucesso!`);
+            
+            // Atualizar a lista principal de produtos
+            this.refreshProductAfterMarketplaceChange();
+          },
+          error: (error) => {
+            this.showErrorViaToast(`Erro ao remover marketplace: ${error.message || 'Erro desconhecido'}`);
+          }
+        });
+    }
+
+    // Método para atualizar a lista de produtos após alterações de marketplace
+    refreshProductAfterMarketplaceChange() {
+      // Recarregar os dados do produto específico
+      if (this.selectedProduct) {
+        this.productService.getProductById(this.selectedProduct.id).subscribe({
+          next: (product: any) => {
+            // Atualizar a lista de produtos
+            const productIndex = this.products.findIndex(p => p.id === this.selectedProduct!.id);
+            if (productIndex !== -1) {
+              // Remover os produtos antigos com este SKU
+              this.products = this.products.filter(p => p.sku !== this.selectedProduct!.sku);
+              
+              // Adicionar os novos produtos com marketplace atualizado
+              const updatedProducts = this.productMapping([{produto: product[0]}]).flat();
+              this.products = [...this.products, ...updatedProducts];
+              
+              // Reagrupar produtos
+              this.groupProductsBySku();
+              
+              // Atualizar a lista de marketplaces no modal
+              this.openProductModal(this.groupedProducts.find(p => p.sku === this.selectedProduct!.sku)!);
+            }
+          }
+        });
+      }
     }
 
     productMapping(products:any[]){
@@ -339,4 +481,50 @@ export class ProductsComponent implements OnInit {
       return n !== Infinity && String(n) === str && n >= 0;
   }
 
+
+  calculate(newMarketplace:MarketPlacePricing, strategy:string){
+    switch(strategy){
+      case CalculateStrategy.MARGIN:
+        newMarketplace.margem_contrib = this.calculateMargin(newMarketplace);
+        break;
+      case CalculateStrategy.PROFIT:
+        newMarketplace.lucro_liquido = this.calculateProfit(newMarketplace);
+        break;
+    }
+  }
+
+  calculateMargin(newMarketplace: MarketPlacePricing) {
+    // Converter comissão para número e calcular a porcentagem
+    const comissaoPercent = parseFloat(newMarketplace.comissao.toString()) / 100;
+    
+    // Calcular o valor da comissão
+    const valorComissao = newMarketplace.preco_venda * comissaoPercent;
+    
+    // Calcular o custo total (custo do produto + comissão)
+    const custoTotal = newMarketplace.preco_custo + valorComissao;
+    
+    // Calcular a margem como porcentagem
+    const margem = ((newMarketplace.preco_venda - custoTotal) / newMarketplace.preco_venda) * 100;
+    
+    return margem;
+  }
+
+  calculateProfit(newMarketplace: MarketPlacePricing) {
+    // Converter comissão para número e calcular a porcentagem
+    const comissaoPercent = parseFloat(newMarketplace.comissao.toString()) / 100;
+    
+    // Calcular o valor da comissão
+    const valorComissao = newMarketplace.preco_venda * comissaoPercent;
+    
+    // Calcular o lucro líquido
+    const lucroLiquido = newMarketplace.preco_venda - newMarketplace.preco_custo - valorComissao;
+    
+    return lucroLiquido;
+  }
+
+  
+
+
+  // Margem = Valor das Vendas – (Custos Variáveis + Despesas Variáveis)
+    //Lucro Líquido = (Receita Total – Custos Totais – Despesas Totais – Impostos)
 }
