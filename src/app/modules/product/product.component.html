@@ -1,4 +1,4 @@
-<div class="layout-wrapper surface-0 flex">
+
     <div id="home" class="overflow-hidden" >
         <span style="margin: 1rem; display: flex; flex-direction: column;">
             <span class="flex">
@@ -29,80 +29,50 @@
            
         </span>
         
-        <div id="userData"  >
+        <div id="userData">
             <p-table
-            #scrollContainer
-            [paginator]="true"
-            [rows]="5"  
-            sortMode="single" 
-            [scrollable]="true"
-            scrollHeight="1000px" 
-            rowGroupMode="subheader" 
-            [value]="products" 
-            [rowsPerPageOptions]="[5,10,20,50]"
-            groupRowsBy="nome" 
-            dataKey="id" 
-            [tableStyle]="{ 'min-width': '240vw', 'height':'100vh'}">
+                #productTable
+                [paginator]="true"
+                [rows]="10"  
+                sortMode="single" 
+                [scrollable]="true"
+                scrollHeight="600px" 
+                [value]="groupedProducts" 
+                [rowsPerPageOptions]="[5,10,20,50]"
+                dataKey="id" 
+                [tableStyle]="{ 'min-width': '100%' }">
+                
                 <ng-template pTemplate="header">
                     <tr>
-                        <th 
-                        style="width:22rem">
-                            SKU 
-                        </th>
-                        <th pSortableColumn="nome" style="width:22rem">
+                        <th style="width:8%">Imagem</th>
+                        <th style="width:10%">Status</th>
+                        <th style="width:13%">SKU</th>
+                        <th pSortableColumn="nome" style="width:25%">
                             Descrição <p-sortIcon field="nome" />
                         </th>
-                        <th style="width:22rem">
-                            Loja 
-                        </th>
-                        <th  style="width:22rem">
-                            Código Ean
-                        </th>
-                        <th style="width:22rem">
-                            Fornecedor
-                        </th>
-                        <th  style="width:22rem">
-                            Classe Produto 
-                        </th>
-
-                        <th pSortableColumn="marketPlace" style="width:22rem">
-                            Market Place <p-sortIcon field="marketPlace" />
-                        </th>
-
-                        <th  style="width:12rem">
-                           Comissão <p-sortIcon  />
-                        </th>
-
-                        <th  style="width:12rem">
-                            Preço custo
-                         </th>
-
-                         <th  style="width:12rem">
-                            Preço venda 
-                         </th>
-
-                         <th  style="width:12rem">
-                            Margem
-                         </th>
-
-                         <th  style="width:12rem">
-                            Lucro Líquido 
-                         </th>
-                         <th  style="width:22rem">
-                            Ações 
-                         </th>
-
-                         <th  style="width:12rem">
-                            Status
-                         </th>
-
-                         <th  style="width:22rem">
-                            Data da  ultima precificação 
-                         </th>
-
-
+                        <th style="width:13%">Loja</th>
+                        <th style="width:12%">Código EAN</th>
+                        <th style="width:10%">Fornecedor</th>
+                        <th style="width:7%">Classe</th>
+                        <th style="width:5%">Ações</th>
                     </tr>
                     <tr>
+                        <th></th>
+                        <th>
+                            <p-columnFilter field="status" matchMode="equals" [showMenu]="false">
+                                <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                                    <p-dropdown 
+                                        [ngModel]="value" 
+                                        [options]="price_statuslist"
+                                        (onChange)="filter($event.value)"
+                                        [showClear]="true">
+                                        <ng-template let-option pTemplate="item">
+                                            {{option}}
+                                        </ng-template>
+                                    </p-dropdown>
+                                </ng-template>
+                            </p-columnFilter>
+                        </th>
                         <th>
                             <p-columnFilter type="text" field="sku" [showClearButton]="true" matchMode="contains" [showMenu]="false"/>
                         </th>
@@ -117,9 +87,9 @@
                                         [options]="empresas"
                                         (onChange)="filter($event.value)"
                                         [showClear]="true">
-                                            <ng-template let-option pTemplate="item">
-                                              {{option}}
-                                            </ng-template>
+                                        <ng-template let-option pTemplate="item">
+                                            {{option}}
+                                        </ng-template>
                                     </p-dropdown>
                                 </ng-template>
                             </p-columnFilter>
@@ -138,192 +108,358 @@
                                         optionLabel="name"
                                         optionValue="name">
                                         <ng-template let-option pTemplate="item">
-                                                <span class="ml-1 mt-1">
-                                                    {{ option.name  }}
-                                                </span>
+                                            <span class="ml-1 mt-1">
+                                                {{ option.name  }}
+                                            </span>
                                         </ng-template>
                                     </p-multiSelect>
-
                                 </ng-template>
                             </p-columnFilter>
                         </th>
                         <th>
                             <p-columnFilter type="text" field="classe" [showClearButton]="true" matchMode="contains" [showMenu]="false" />
                         </th>
-                        <th>
-                            <p-columnFilter type="text" field="marketPlace" [showClearButton]="true" matchMode="contains" [showMenu]="false" />
-                        </th>
-                        <th>
-                          
-                        </th>
-                        <th>
-                        </th>
-                        <th>
-                        </th>
-                        <th>
-                        </th>
-                        <th>
-                        </th>
-                        <th>
-                        </th>
-                        <th>
-                            <p-columnFilter field="status" matchMode="equals" [showMenu]="false">
-                                <ng-template pTemplate="filter" let-value let-filter="filterCallback">
-                                    <p-dropdown 
-                                        [ngModel]="value" 
-                                        [options]="price_statuslist"
-                                        (onChange)="filter($event.value)"
-                                        [showClear]="true"
-                                        >
-                                            <ng-template let-option pTemplate="item">
-                                              {{option}}
-                                            </ng-template>
-                                    </p-dropdown>
-                                </ng-template>
-                            </p-columnFilter>
-                        </th>
-                        <th>
-                        </th>
+                        <th></th>
                     </tr>
                 </ng-template>
-                <ng-template pTemplate="groupheader" let-product>
-                    <tr pRowGroupHeader>
-                        <td colspan="15" style="vertical-align: middle;">
-                            <span 
-                            class="flex align-items-center">
-                                <p-image
-                                [alt]="product.nome" 
-                                [src]="product.imagem" 
-                                width="250" 
-                                [preview]="false"
-                                />
-                            <span  style="font-size: 1.5rem;vertical-align: middle;" class="font-bold ml-2">
-                                {{product.nome}}
-                                <p-tag 
-                            [severity]="price_status[product.status]?.severity" 
-                            [value]="price_status[product.status]?.label"></p-tag>
-                            </span>
-                        
-                            </span>
-                            </td>
-                    </tr>
-                </ng-template>
-                <ng-template pTemplate="body" let-product let-editing="editing">
-                    <tr>
-                        <td  >
-                            {{ product.sku }}
+                
+                <ng-template pTemplate="body" let-product>
+                    <tr class="product-row" (click)="openProductModal(product)" style="cursor: pointer;">
+                        <td class="text-center">
+                            <img [src]="product.imagem" [alt]="product.nome" 
+                                 width="50" height="50" 
+                                 style="object-fit: cover; border-radius: 4px;"
+                                 onerror="this.src='assets/demo/images/product/placeholder.png'" />
                         </td>
-                        <td  >
-                            {{ product.nome }}
-                        </td>
-                        <td  >
-                            {{ product.empresa }}
-                        </td>
-                        <td  >
-                            {{ product.codigo_ean }}
-                        </td>
-                        <td  >
-                            {{ product.fornecedor }}
-                        </td>
-                        <td>
-                            {{ product.classe }}
-                        </td>
-                        <td>
-                            {{ product.marketPlace }}
-                        </td>
-                        <td>
-                            {{ product.comissao }}
-                        </td>
-                        <td [pEditableColumn]="product.preco_custo" pEditableColumnField="preco_custo">
-                            <p-cellEditor>
-                                <ng-template pTemplate="input">
-                                     <p-inputNumber 
-                                        [(ngModel)]="product.preco_custo" 
-                                        mode="decimal"  
-                                        [maxFractionDigits]="10"
-                                        (keydown.enter)="onEdit($event)"/> 
-                                </ng-template>
-                                <ng-template pTemplate="output">
-                                    {{ product.preco_custo | currency:'BRL':true:'1.2-10' }}
-                                </ng-template>
-                            </p-cellEditor>
-                        </td>
-                      
-                        <td [pEditableColumn]="product.preco_venda" pEditableColumnField="preco_venda">
-                            <p-cellEditor>
-                                <ng-template pTemplate="input">
-                                     <p-inputNumber 
-                                        [(ngModel)]="product.preco_venda" 
-                                        mode="decimal"  
-                                        [maxFractionDigits]="10"
-                                        (keydown.enter)="onEdit($event)"/> 
-                                </ng-template>
-                                <ng-template pTemplate="output">
-                                    {{ product.preco_venda | currency:'BRL':true:'1.2-10' }}
-                                </ng-template>
-                            </p-cellEditor>
-                        </td>
-                      
-                        <td [pEditableColumn]="product.margem_contrib" pEditableColumnField="margem_contrib">
-                            <p-cellEditor>
-                                <ng-template pTemplate="input">
-                                    <p-inputNumber 
-                                        [(ngModel)]="product.margem_contrib" 
-                                        mode="decimal"  
-                                        [maxFractionDigits]="10"
-                                        (keydown.enter)="onEdit($event)"
-                                       /> 
-
-                                </ng-template>
-                                <ng-template pTemplate="output">
-                                    {{ product.margem_contrib + '%'}}
-                                </ng-template>
-                            </p-cellEditor>
-                        </td>
-                      
-                        <td [pEditableColumn]="product.lucro_liquido" pEditableColumnField="lucro_liquido">
-                            <p-cellEditor>
-                                <ng-template pTemplate="input">
-                                    <p-inputNumber 
-                                     [(ngModel)]="product.lucro_liquido"
-                                    mode="decimal"  
-                                    [maxFractionDigits]="10"
-                                     (keydown.enter)="onEdit($event)" />
-                                </ng-template>
-                                <ng-template pTemplate="output">
-                                    {{ product.lucro_liquido | currency:'BRL':true:'1.2-10' }}
-                                </ng-template>
-                            </p-cellEditor>
-                        </td>
-
-                        <td >
-                            <p-button 
-                            label="Atualizar produto" 
-                            severity="success"
-                            icon="pi pi-edit" 
-                            (onClick)="updateProduct(product)" />
-                        </td>
-                      
-                      
                         <td>
                             <p-tag 
-                            [severity]="price_status[product.status]?.severity" 
-                            [value]="price_status[product.status]?.label"></p-tag>
+                                [severity]="price_status[product.status]?.severity" 
+                                [value]="price_status[product.status]?.label">
+                            </p-tag>
                         </td>
-                      
-                      
+                        <td>{{ product.sku }}</td>
+                        <td>{{ product.nome }}</td>
+                        <td>{{ product.empresa }}</td>
+                        <td>{{ product.codigo_ean }}</td>
+                        <td>{{ product.fornecedor }}</td>
+                        <td>{{ product.classe }}</td>
                         <td>
-                            {{ product.data_ultima_prec | date}}
+                            <p-button icon="pi pi-search" (onClick)="openProductModal(product); $event.stopPropagation()" [rounded]="true" [text]="true" severity="success" />
                         </td>
-                      
                     </tr>
                 </ng-template>
             </p-table>
-        
-            
         </div>
 
-    
+        <!-- Modal de Detalhes do Produto -->
+        <p-dialog 
+            [(visible)]="displayProductModal" 
+            [modal]="true" 
+            [responsive]="true" 
+            [style]="{width: '90vw', maxWidth: '1200px'}" 
+            [maximizable]="true"
+            header="Detalhes do Produto">
+            
+            <div *ngIf="selectedProduct" class="product-detail-container">
+                <!-- Cabeçalho do Produto -->
+                <div class="product-header flex gap-4 mb-4">
+                    <div class="product-image">
+                        <img 
+                            [src]="selectedProduct.imagem" 
+                            [alt]="selectedProduct.nome"
+                            style="width: 200px; height: 200px; object-fit: cover; border-radius: 8px;"
+                            onerror="this.src='assets/demo/images/product/placeholder.png'"
+                        />
+                    </div>
+                    <div class="product-info flex-1">
+                        <h2 class="product-title">{{ selectedProduct.nome }}</h2>
+                        <div class="product-details grid">
+                            <div class="col-6">
+                                <p><strong>SKU:</strong> {{ selectedProduct.sku }}</p>
+                                <p><strong>Código EAN:</strong> {{ selectedProduct.codigo_ean }}</p>
+                                <p><strong>Fornecedor:</strong> {{ selectedProduct.fornecedor }}</p>
+                            </div>
+                            <div class="col-6">
+                                <p><strong>Loja:</strong> {{ selectedProduct.empresa }}</p>
+                                <p><strong>Classe:</strong> {{ selectedProduct.classe }}</p>
+                                <p><strong>Status:</strong> 
+                                    <p-tag 
+                                        [severity]="price_status[selectedProduct.status]?.severity" 
+                                        [value]="price_status[selectedProduct.status]?.label">
+                                    </p-tag>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tabela de Precificação -->
+                <div class="pricing-section">
+                    <div class="flex justify-content-between align-items-center mb-3">
+                        <h3 class="m-0">Precificação por Marketplace</h3>
+                        <p-button 
+                            icon="pi pi-plus-circle" 
+                            label="Adicionar Marketplace"
+                            size="small"
+                            severity="success"
+                            (onClick)="addMarketPlace(selectedProduct)">
+                        </p-button>
+                    </div>
+                    
+                    <p-table 
+                        [value]="productMarketplaces" 
+                        [scrollable]="true"
+                        [tableStyle]="{ 'min-width': '100%' }"
+                        editMode="row">
+                        
+                        <ng-template pTemplate="header">
+                            <tr>
+                                <th>Marketplace</th>
+                                <th>Comissão</th>
+                                <th>Preço Custo</th>
+                                <th>Preço Venda</th>
+                                <th>Margem</th>
+                                <th>Lucro Líquido</th>
+                                <th>Status</th>
+                                <th>Última Precificação</th>
+                                <th>Ações</th>
+                            </tr>
+                        </ng-template>
+                        
+                        <ng-template pTemplate="body" let-marketPlace let-editing="editing" let-ri="rowIndex">
+                            <tr [ngClass]="{'new-marketplace': marketPlace.isNew}">
+                                <td>{{ marketPlace.marketPlace }}</td>
+                                <td>{{ marketPlace.comissao }}</td>
+                                <td [pEditableColumn]="marketPlace.preco_custo" pEditableColumnField="preco_custo">
+                                    <p-cellEditor>
+                                        <ng-template pTemplate="input">
+                                            <p-inputNumber 
+                                                [(ngModel)]="marketPlace.preco_custo" 
+                                                mode="decimal" 
+                                                currency="BRL"
+                                                [style]="{'width':'100%'}"
+                                                (keydown.enter)="onEdit($event)">
+                                            </p-inputNumber>
+                                        </ng-template>
+                                        <ng-template pTemplate="output">
+                                            {{ marketPlace.preco_custo | currency:'BRL':true:'1.2-10' }}
+                                        </ng-template>
+                                    </p-cellEditor>
+                                </td>
+                                <td [pEditableColumn]="marketPlace.preco_venda" pEditableColumnField="preco_venda">
+                                    <p-cellEditor>
+                                        <ng-template pTemplate="input">
+                                            <p-inputNumber 
+                                                [(ngModel)]="marketPlace.preco_venda" 
+                                                mode="decimal" 
+                                                [maxFractionDigits]="10"
+                                                [style]="{'width':'100%'}"
+                                                (keydown.enter)="onEdit($event)">
+                                            </p-inputNumber>
+                                        </ng-template>
+                                        <ng-template pTemplate="output">
+                                            {{ marketPlace.preco_venda |  currency:'BRL':true:'1.2-10' }}
+                                        </ng-template>
+                                    </p-cellEditor>
+                                </td>
+                                <td [pEditableColumn]="marketPlace.margem_contrib" pEditableColumnField="margem_contrib">
+                                    <p-cellEditor>
+                                        <ng-template pTemplate="input">
+                                            <p-inputNumber 
+                                                [(ngModel)]="marketPlace.margem_contrib" 
+                                                mode="decimal"  
+                                                [maxFractionDigits]="10"
+                                                [style]="{'width':'100%'}"
+                                                (keydown.enter)="onEdit($event)">
+                                            </p-inputNumber>
+                                        </ng-template>
+                                        <ng-template pTemplate="output">
+                                            {{ marketPlace.margem_contrib }}%
+                                        </ng-template>
+                                    </p-cellEditor>
+                                </td>
+                                <td [pEditableColumn]="marketPlace.lucro_liquido" pEditableColumnField="lucro_liquido">
+                                    <p-cellEditor>
+                                        <ng-template pTemplate="input">
+                                            <p-inputNumber 
+                                                [(ngModel)]="marketPlace.lucro_liquido" 
+                                                mode="decimal"  
+                                                [maxFractionDigits]="10"
+                                                [style]="{'width':'100%'}">
+                                            </p-inputNumber>
+                                        </ng-template>
+                                        <ng-template pTemplate="output">
+                                            {{ marketPlace.lucro_liquido |  currency:'BRL':true:'1.2-10' }}
+                                        </ng-template>
+                                    </p-cellEditor>
+                                </td>
+                                <td>
+                                    <p-tag 
+                                        [severity]="price_status[marketPlace.status]?.severity" 
+                                        [value]="price_status[marketPlace.status]?.label">
+                                    </p-tag>
+                                </td>
+                                <td>{{ marketPlace.data_ultima_prec | date:'dd/MM/yyyy HH:mm' }}</td>
+                                <td>
+                                    <div class="flex gap-2">
+                                        <!-- Botão para salvar novo marketplace -->
+                                        <p-button *ngIf="marketPlace.isNew"
+                                            icon="pi pi-save" 
+                                            size="small"
+                                            severity="success"
+                                            pTooltip="Salvar novo marketplace"
+                                            (onClick)="saveNewMarketplace(marketPlace)">
+                                        </p-button>
+                                        
+                                        <!-- Botão para excluir marketplace -->
+                                        <p-button 
+                                            icon="pi pi-trash" 
+                                            size="small"
+                                            severity="danger"
+                                            pTooltip="Excluir marketplace"
+                                            (onClick)="deleteMarketPlace(marketPlace)">
+                                        </p-button>
+                                        
+                                        <!-- Botão para atualizar marketplace existente -->
+                                        <p-button *ngIf="!marketPlace.isNew"
+                                            icon="pi pi-pencil" 
+                                            size="small"
+                                            severity="warn"
+                                            pTooltip="Atualizar marketplace"
+                                            (onClick)="updateProduct(selectedProduct)">
+                                        </p-button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </ng-template>
+                        
+                        <!-- Template para quando não há dados -->
+                        <ng-template pTemplate="emptymessage">
+                            <tr>
+                                <td colspan="9" class="text-center p-4">
+                                    <div class="flex flex-column align-items-center">
+                                        <i class="pi pi-shopping-cart text-6xl text-primary mb-3"></i>
+                                        <span>Nenhum marketplace configurado para este produto</span>
+                                        <p-button 
+                                            label="Adicionar marketplace" 
+                                            icon="pi pi-plus"
+                                            styleClass="p-button-outlined mt-3"
+                                            (onClick)="addMarketPlace(selectedProduct)">
+                                        </p-button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </ng-template>
+                    </p-table>
+                </div>
+            </div>
+        </p-dialog>
     </div>
-</div>
+
+<p-dialog 
+    [(visible)]="displayAddMarketplaceDialog" 
+    [modal]="true"
+    [draggable]="false"
+    [resizable]="false"
+    [style]="{width: '800px'}"
+    header="Adicionar Novo Marketplace">
+    
+    <div class="grid p-fluid">
+        <div class="col-6 field">
+            <label for="marketplace">Marketplace*</label>
+            <p-dropdown 
+                id="marketplace"
+                [options]="filteredMarketplaces" 
+                [(ngModel)]="newMarketplace.marketPlace"
+                placeholder="Selecione um marketplace"
+                [filter]="true"
+                filterBy="value"
+                [showClear]="true"
+                appendTo="body"
+                styleClass="w-full">
+            </p-dropdown>
+        </div>
+        
+        <div class="col-6 field">
+            <label for="comissao">Comissão (%)*</label>
+            <div class="p-inputgroup">
+                <input 
+                    id="comissao"
+                    type="text" 
+                    pInputText 
+                    [(ngModel)]="newMarketplace.comissao" 
+                    placeholder="Ex: 12%">
+            </div>
+        </div>
+        
+        <div class="col-6 field">
+            <label for="precoCusto">Preço de Custo (R$)*</label>
+            <p-inputNumber 
+                id="precoCusto"
+                [(ngModel)]="newMarketplace.preco_custo" 
+                mode="currency" 
+                currency="BRL"
+                locale="pt-BR"
+                [minFractionDigits]="2">
+            </p-inputNumber>
+        </div>
+        
+        <div class="col-6 field">
+            <label for="precoVenda">Preço de Venda (R$)*</label>
+            <p-inputNumber 
+                id="precoVenda"
+                [(ngModel)]="newMarketplace.preco_venda" 
+                mode="currency" 
+                currency="BRL"
+                locale="pt-BR"
+                (onBlur)="calculate(newMarketplace, 'MARGIN'); calculate(newMarketplace, 'PROFIT')"
+                (keydown.enter)="calculate(newMarketplace, 'MARGIN'); calculate(newMarketplace, 'PROFIT')"
+                (keydown.tab)="calculate(newMarketplace, 'MARGIN'); calculate(newMarketplace, 'PROFIT')"
+                [minFractionDigits]="2">
+            </p-inputNumber>
+        </div>
+        
+        <div class="col-6 field">
+            <label for="margem">Margem de Contribuição (%)*</label>
+            <div class="p-inputgroup">
+                <p-inputNumber 
+                    id="margem"
+                    [(ngModel)]="newMarketplace.margem_contrib" 
+                    suffix="%"
+                    [minFractionDigits]="2">
+                </p-inputNumber>
+            </div>
+        </div>
+        
+        <div class="col-6 field">
+            <label for="lucro">Lucro Líquido (R$)*</label>
+            <p-inputNumber 
+                id="lucro"
+                [(ngModel)]="newMarketplace.lucro_liquido" 
+                mode="currency" 
+                currency="BRL"
+                locale="pt-BR"
+                [minFractionDigits]="2">
+            </p-inputNumber>
+        </div>
+    </div>
+    
+    <ng-template pTemplate="footer">
+        <p-button 
+            icon="pi pi-times" 
+            label="Cancelar" 
+            severity="success"
+            (onClick)="displayAddMarketplaceDialog=false" 
+            styleClass="p-button-text">
+        </p-button>
+        <p-button 
+            icon="pi pi-plus" 
+            label="Adicionar" 
+            severity="success"
+            (onClick)="addNewMarketplaceToList()" 
+            [disabled]="!newMarketplace.marketPlace">
+        </p-button>
+    </ng-template>
+</p-dialog>
+
 <p-toast key="tst"></p-toast>

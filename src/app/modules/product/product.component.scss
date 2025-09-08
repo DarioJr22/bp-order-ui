@@ -44,11 +44,32 @@ td{
     font-weight: 600;
     font-size: 1.2rem;
     text-align: center;
+    vertical-align: middle !important;
 }
 
 th{
     font-size: 1.3rem;
     text-align: center;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.product-image-cell {
+    padding: 0.5rem;
+    text-align: center;
+}
+
+.product-image {
+    object-fit: cover;
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+    transition: all 0.3s cubic-bezier(.25,.8,.25,1);
+}
+
+.product-image:hover {
+    box-shadow: 0 4px 8px rgba(0,0,0,0.25), 0 3px 3px rgba(0,0,0,0.22);
 }
 
 #usersList{
@@ -84,5 +105,38 @@ th{
     }
     .p-button.carregamento{
         margin: 2rem;
+    }
+    
+    // Estilos para o modal
+    .product-detail-container {
+        .product-header {
+            border-bottom: 1px solid #e9ecef;
+            padding-bottom: 1rem;
+            
+            .product-title {
+                color: #495057;
+                margin-bottom: 1rem;
+            }
+            
+            .product-details p {
+                margin-bottom: 0.5rem;
+                color: #6c757d;
+            }
+        }
+        
+        .pricing-section {
+            h3 {
+                color: #495057;
+                margin-bottom: 1rem;
+                border-bottom: 2px solid var(--primary-color);
+                padding-bottom: 0.5rem;
+            }
+        }
+    }
+    
+    // Hover effect para as linhas da tabela principal
+    .product-row:hover {
+        background-color: #f8f9fa !important;
+        cursor: pointer;
     }
 }

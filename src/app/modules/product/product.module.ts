@@ -27,6 +27,7 @@ import { TagModule } from 'primeng/tag';
 import { CalendarModule } from 'primeng/calendar';
 import { ImageModule } from 'primeng/image';
 import { TooltipModule } from 'primeng/tooltip';
+import { DialogModule } from 'primeng/dialog';
 import { ProductService } from './product.service';
 @NgModule({
     imports: [
@@ -57,7 +58,8 @@ import { ProductService } from './product.service';
         InputNumberModule,
         CalendarModule,
         ImageModule,
-        TooltipModule
+        TooltipModule,
+        DialogModule
     ],
     declarations: [ProductsComponent],
     providers:[MessageService,ProductService]

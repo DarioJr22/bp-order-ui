@@ -43,6 +43,23 @@ export class ProductService {
     return this.http.get(`${URL}/product/byId/${id}`)
   }
 
+  // Adicionar marketplace pricing
+  addMarketplacePricing(codigo: string, pricing: ProducPricing) {
+    return this.http.post(`${URL}/product/marketplace-pricing`, {
+      codigo: codigo,
+      pricing: pricing
+    })
+  }
+
+  // Remover marketplace pricing
+  deleteMarketplacePricing(codigo: string, marketplace: string) {
+    return this.http.delete(`${URL}/product/marketplace-pricing`, {
+      body: {
+        codigo: codigo,
+        marketplace: marketplace
+      }
+    })
+  }
 
   //Expiration Pricing
 
@@ -76,24 +93,6 @@ export class ProductService {
   }
 
   statusControl(products: Product[]) {
-    //If a product was priced, then the date and time must be recorded.
-
-    /*   id:product.produto.id,
-                  sku:product.produto.codigo,
-                  nome:product.produto.nome,
-                  codigo_ean:product.produto.gtin,
-                  imagem:product.produto.anexos[0] ? product.produto.anexos[0].anexo : "Sem imagens para o produto" ,
-                  fornecedor:product.produto.nome_fornecedor,
-                  classe:CLASSPRODUCT_DATABASE_MAPPER[product.produto.classe_produto],
-                  marketPlace:marketPlaceData.marketplace,
-                  comissao:marketPlaceData.comissao,
-                  preco_custo:`${marketPlaceData.preco_custo}`,
-                  preco_venda:`${marketPlaceData.preco_venda}`,
-                  margem_contrib:`${marketPlaceData.margem_contribuicao}`,
-                  lucro_liquido:`${marketPlaceData.lucro_liquido}`,
-                  status:marketPlaceData.status,
-                  data_ultima_prec:marketPlaceData.data_precificacao, */
-
     products.forEach((product) => {
 
       let status = product.status
@@ -134,5 +133,16 @@ export class ProductService {
     )
   }
 
+  
+
+
+
+
 
 }
+
+
+ export enum CalculateStrategy{
+    PROFIT = 'PROFIT',
+    MARGIN = 'MARGIN'
+  }
