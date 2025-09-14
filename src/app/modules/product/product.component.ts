@@ -217,9 +217,7 @@ export class ProductsComponent implements OnInit {
     // Filtrar marketplaces que ainda não foram adicionados
     filterAvailableMarketplaces() {
       const currentMarketplaces = this.productMarketplaces.map(mp => mp.marketPlace);
-      this.filteredMarketplaces = this.availableMarketplaces.filter(
-        mp => !currentMarketplaces.includes(mp)
-      );
+      this.filteredMarketplaces = this.availableMarketplaces.map(mp => mp)
     }
 
     // Resetar o novo marketplace
