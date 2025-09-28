@@ -175,14 +175,11 @@ export class ProductsComponent implements OnInit {
     }
 
     updateProduct(newProduct:Product){
-      console.log(newProduct);
-      console.log(this.productMarketplaces);
-
-      newProduct.marketPlace = this.productMarketplaces
+      let productToUpdate = this.productMarketplaces.find(mp => mp.marketPlace === newProduct.marketPlace)
+      Object.assign(newProduct, productToUpdate)
       this.productService.getProductById(newProduct.id).pipe(switchMap(
         (oldProduct:any)=>{
           let productPricing = oldProduct[0].preco_marketplace
-
            productPricing.forEach((productPricing)=>{
             if(newProduct.marketPlace == productPricing.marketplace){
                 productPricing.lucro_liquido = newProduct.lucro_liquido
