@@ -174,33 +174,51 @@ export class ProductsComponent implements OnInit {
        })
     }
 
-    updateProduct(newProduct:Product){
-      let productToUpdate = this.productMarketplaces.find(mp => mp.marketPlace === newProduct.marketPlace)
-      Object.assign(newProduct, productToUpdate)
-      this.productService.getProductById(newProduct.id).pipe(switchMap(
-        (oldProduct:any)=>{
-          let productPricing = oldProduct[0].preco_marketplace
-           productPricing.forEach((productPricing)=>{
-            if(newProduct.marketPlace == productPricing.marketplace){
-                productPricing.lucro_liquido = newProduct.lucro_liquido
-                productPricing.margem_contribuicao = newProduct.margem_contrib
-                productPricing.preco_custo = `${newProduct.preco_custo}`
-                productPricing.preco_venda = `${newProduct.preco_venda}`
-                productPricing.data_precificacao = new Date();
-                productPricing.status = ProdutoStatus.PRECIFICADO;
-            }
-          })
+    updateProduct(marketplace: any) {
+      if (!this.selectedProduct) {
+        this.showErrorViaToast('Nenhum produto selecionado');
+        return;
+      }
 
-          return this.productService.updateProdut(newProduct.sku,productPricing)
-        })).subscribe({ 
-          next:()=>{
-            this.showSucsessViaToast(`Produto ${ newProduct.nome} atualizado com sucesso !`)
-            newProduct.status = ProdutoStatus.PRECIFICADO
-          },
-          error:()=>{
-            this.showErrorViaToast(`Erro ao atualizar Produto ${ newProduct.nome} !`)
-          }
-      })
+      // Usar o ID e SKU do selectedProduct
+      const productId = this.selectedProduct.id;
+      const productSku = this.selectedProduct.sku;
+      
+      if (!productId || !productSku) {
+        this.showErrorViaToast('Dados do produto não encontrados');
+        return;
+      }
+      
+      this.productService.getProductById(productId).pipe(switchMap(
+        (oldProduct: any) => {
+          let productPricing = oldProduct[0].preco_marketplace;
+          
+          productPricing.forEach((pricing: any) => {
+            if (marketplace.marketPlace == pricing.marketplace) {
+              // Atualizar apenas com os valores digitados pelo usuário
+              pricing.lucro_liquido = marketplace.lucro_liquido.toString();
+              pricing.margem_contribuicao = marketplace.margem_contrib.toString();
+              pricing.preco_custo = marketplace.preco_custo.toString();
+              pricing.preco_venda = marketplace.preco_venda.toString();
+              pricing.comissao = marketplace.comissao;
+              pricing.data_precificacao = new Date();
+              pricing.status = ProdutoStatus.PRECIFICADO; // Sempre PRECIFICADO ao atualizar
+            }
+          });
+
+          return this.productService.updateProdut(productSku, productPricing);
+        })
+      ).subscribe({ 
+        next: () => {
+          this.showSucsessViaToast(`Marketplace ${marketplace.marketPlace} atualizado com sucesso!`);
+          marketplace.status = ProdutoStatus.PRECIFICADO; // Sempre PRECIFICADO ao atualizar
+          this.getAllProducts();
+        },
+        error: (error) => {
+          console.error('Erro ao atualizar:', error);
+          this.showErrorViaToast(`Erro ao atualizar marketplace ${marketplace.marketPlace}!`);
+        }
+      });
     }
 
 
@@ -411,27 +429,6 @@ export class ProductsComponent implements OnInit {
     this.editingRows[index] = true;
   }
 
-  onRowEditSave(marketplace: any, index: number) {
-    // Encontrar o produto correspondente na lista principal
-    const productToUpdate = this.products.find(p => 
-      p.sku === this.selectedProduct!.sku && 
-      p.marketPlace === marketplace.marketPlace
-    );
-    
-    if (productToUpdate) {
-      // Atualizar os valores
-      productToUpdate.preco_custo = marketplace.preco_custo.toString();
-      productToUpdate.preco_venda = marketplace.preco_venda.toString();
-      productToUpdate.margem_contrib = marketplace.margem_contrib.toString();
-      productToUpdate.lucro_liquido = marketplace.lucro_liquido.toString();
-      
-      // Chamar o método de atualização existente
-      this.updateProduct(productToUpdate);
-    }
-    
-    delete this.editingRows[index];
-  }
-
   onRowEditCancel(marketplace: any, index: number) {
     // Restaurar valores originais se necessário
     delete this.editingRows[index];
@@ -522,4 +519,15 @@ export class ProductsComponent implements OnInit {
 
   // Margem = Valor das Vendas – (Custos Variáveis + Despesas Variáveis)
     //Lucro Líquido = (Receita Total – Custos Totais – Despesas Totais – Impostos)
+
+  handleImageError(event: Event): void {
+    const img = event.target as HTMLImageElement;
+    if (!img.dataset['fallbackAttempted']) {
+      img.dataset['fallbackAttempted'] = 'true';
+      img.src = 'assets/demo/images/product/placeholder.png';
+    } else {
+      // Se já tentou o fallback, usa uma imagem SVG base64 para evitar loop infinito
+      img.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTAiIGhlaWdodD0iNTAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjUwIiBoZWlnaHQ9IjUwIiBmaWxsPSIjZGRkIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtc2l6ZT0iMTIiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIiBmaWxsPSIjOTk5Ij5OL0E8L3RleHQ+PC9zdmc+';
+    }
+  }
 }

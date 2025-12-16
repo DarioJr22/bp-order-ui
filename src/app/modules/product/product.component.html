@@ -129,7 +129,7 @@
                             <img [src]="product.imagem" [alt]="product.nome" 
                                  width="50" height="50" 
                                  style="object-fit: cover; border-radius: 4px;"
-                                 onerror="this.src='assets/demo/images/product/placeholder.png'" />
+                                 (error)="handleImageError($event)" />
                         </td>
                         <td>
                             <p-tag 
@@ -168,7 +168,7 @@
                             [src]="selectedProduct.imagem" 
                             [alt]="selectedProduct.nome"
                             style="width: 200px; height: 200px; object-fit: cover; border-radius: 8px;"
-                            onerror="this.src='assets/demo/images/product/placeholder.png'"
+                            (error)="handleImageError($event)"
                         />
                     </div>
                     <div class="product-info flex-1">
@@ -326,7 +326,7 @@
                                             size="small"
                                             severity="warn"
                                             pTooltip="Atualizar marketplace"
-                                            (onClick)="updateProduct(selectedProduct)">
+                                            (onClick)="updateProduct(marketPlace)">
                                         </p-button>
                                     </div>
                                 </td>
